@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  app:
+    command: ./node_modules/.bin/next dev
+    build:
+      context: ../../
+      dockerfile: docker/coops-dev/Dockerfile
+    working_dir: /app
+    ports:
+      - 3000:3000
+    volumes:
+      - ../../src:/app/src
+      - ../../public:/app/public

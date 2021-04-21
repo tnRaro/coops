@@ -7,7 +7,6 @@
       "label": "docker-compose dev up",
       "type": "docker-compose",
       "dockerCompose": {
-        "envFiles": ["${workspaceFolder}/.env.local"],
         "up": {
           "detached": true,
           "build": true

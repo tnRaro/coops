@@ -42,6 +42,7 @@ const templates = {
     "package.json": JSON.stringify({
       name: packageName,
       private: true,
+      version: "1.0.0",
     }),
   },
   dirs: ["src"],

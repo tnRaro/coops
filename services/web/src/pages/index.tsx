@@ -1,4 +1,5 @@
 import { Container, Heading, Text } from "@chakra-ui/layout";
+import { GetStaticProps } from "next";
 import { VoidFunctionComponent } from "react";
 
 type PageProps = unknown;

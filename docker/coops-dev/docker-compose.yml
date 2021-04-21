@@ -1,14 +1,15 @@
 version: "3.8"
 
 services:
-  app:
-    command: ./node_modules/.bin/next dev
+  web:
+    command: yarn web dev
     build:
       context: ../../
-      dockerfile: docker/coops-dev/Dockerfile
+      dockerfile: docker/coops-dev/web.Dockerfile
     working_dir: /app
+    env_file: "../../services/web/.env.local"
     ports:
       - 3000:3000
     volumes:
-      - ../../src:/app/src
-      - ../../public:/app/public
+      - ../../services/web/src:/app/services/web/src
+      - ../../services/web/public:/app/services/web/public

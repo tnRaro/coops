@@ -19,7 +19,7 @@ export const apiRouter = (handlers: ApiHandlers): NextApiHandler => {
       res.status(405).end();
       return;
     }
-    handler(req, res)
+    return handler(req, res)
       .then((data) => {
         if (data == null) {
           res.statusCode = 204;

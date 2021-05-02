@@ -14,3 +14,8 @@ services:
     volumes:
       - ../../services/web/src:/app/services/web/src
       - ../../services/web/public:/app/services/web/public
+  peer:
+    image: peerjs/peerjs-server
+    command: --port 9000 --path /
+    ports:
+      - 9000:9000

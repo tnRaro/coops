@@ -18,6 +18,7 @@ const theme = extendTheme({
     },
     popOut: {
       backgroundColor: "rgba(39, 43, 47, 0.66)",
+      boxShadow: "popOut",
     },
   },
   textStyles: {

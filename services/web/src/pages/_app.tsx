@@ -3,6 +3,65 @@ import type { AppProps } from "next/app";
 import { VoidFunctionComponent } from "react";
 
 const theme = extendTheme({
+  styles: {
+    global: {
+      "html, body": {
+        backgroundColor: "elevation.0",
+      },
+    },
+  },
+  layerStyles: {
+    card: {
+      backgroundColor:
+        "radial-gradiant(71.72% 56.77% at 0% 0%, rgba(255, 196, 82, 0.1) 0%, rgba(255, 196, 82, 0) 100%), elevation.1",
+      boxShadow: "overlay",
+    },
+    popOut: {
+      backgroundColor: "rgba(39, 43, 47, 0.66)",
+    },
+  },
+  textStyles: {
+    heading1: {
+      fontSize: "heading1",
+      fontWeight: "bold",
+      lineHeight: "heading",
+    },
+    heading2: {
+      fontSize: "heading2",
+      fontWeight: "bold",
+      lineHeight: "heading",
+    },
+    heading3: {
+      fontSize: "heading3",
+      fontWeight: "bold",
+      lineHeight: "heading",
+    },
+    heading4: {
+      fontSize: "heading4",
+      fontWeight: "bold",
+      lineHeight: "heading",
+    },
+    heading5: {
+      fontSize: "heading5",
+      fontWeight: "bold",
+      lineHeight: "heading",
+    },
+    label1: {
+      fontSize: "label",
+      fontWeight: "medium",
+      lineHeight: "label",
+    },
+    label1Bold: {
+      fontSize: "label",
+      fontWeight: "bold",
+      lineHeight: "label",
+    },
+    paragraph1: {
+      fontSize: "paragraph",
+      fontWeight: "meduim",
+      lineHeight: "paragraph",
+    },
+  },
   colors: {
     primary: {
       100: "hsl(40 100% 66% / 100%)",

@@ -19,3 +19,5 @@ services:
     command: --port 9000 --path /
     ports:
       - 9000:9000
+  redis:
+    image: redis:6.2.3-alpine

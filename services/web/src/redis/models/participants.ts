@@ -3,9 +3,11 @@ import { v4 as uuidv4 } from "uuid";
 
 import { ModelError } from "../../app/errors/ModelError";
 
+// eslint-disable-next-line import/no-cycle
 import { hasRoom } from "./rooms";
 
-interface Participant {
+export interface Participant {
+  participantId: string;
   nickname: string;
   peerId: string;
   isHost: boolean;
@@ -69,10 +71,20 @@ export const hasParticipantId = (
   });
 };
 export const numOfParticipantIds = (client: RedisClient, roomId: string) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<number>((resolve, reject) => {
     client.scard(useParticipantIdKey(roomId), (error, reply) => {
       if (error) {
         reject(error);
+      }
+      resolve(reply);
+    });
+  });
+};
+export const getAllParticipantIds = (client: RedisClient, roomId: string) => {
+  return new Promise<string[]>((resolve, reject) => {
+    client.smembers(useParticipantIdKey(roomId), (error, reply) => {
+      if (error) {
+        return reject(error);
       }
       resolve(reply);
     });
@@ -110,7 +122,7 @@ export const getParticipant = <TFields extends (keyof Participant)[]>(
   return new Promise<TResults>((resolve, reject) => {
     client.hmget(
       useParticipantKey(roomId, participantId),
-      fields.join(" "),
+      fields,
       (error, reply) => {
         if (error) {
           return reject(error);
@@ -123,19 +135,42 @@ export const getParticipant = <TFields extends (keyof Participant)[]>(
 
 // high-level API
 
+export const hasParticipant = async (
+  client: RedisClient,
+  roomId: string,
+  nickname: string,
+) => {
+  const participantIds = await getAllParticipantIds(client, roomId);
+  for (const participantId of participantIds) {
+    const [participantNickname] = await getParticipant(
+      client,
+      roomId,
+      participantId,
+      "nickname",
+    );
+    if (nickname === participantNickname) {
+      return true;
+    }
+  }
+  return false;
+};
 export const enterParticipantAtRoom = async (
   client: RedisClient,
   roomId: string,
   nickname: string,
 ) => {
-  if (!hasRoom(client, roomId)) {
+  if (!(await hasRoom(client, roomId))) {
     throw new ModelError(404);
   }
   const participantId = uuidv4();
   const peerId = uuidv4();
+  if (await hasParticipant(client, roomId, nickname)) {
+    throw new ModelError(409);
+  }
   await addParticipantId(client, roomId, participantId);
   const numOfParticipants = await numOfParticipantIds(client, roomId);
   const participant: Participant = {
+    participantId,
     nickname,
     peerId,
     isHost: numOfParticipants === 1,
@@ -173,4 +208,65 @@ export const isParticipant = async (
     throw new ModelError(404);
   }
   return hasParticipantId(client, roomId, participantId);
+};
+export const clearParticipantsFromRoom = async (
+  client: RedisClient,
+  roomId: string,
+) => {
+  const participantIds = await getAllParticipantIds(client, roomId);
+  const errors = [];
+  for (const participantId of participantIds) {
+    try {
+      await removeParticipantId(client, roomId, participantId);
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+  if (errors.length > 0) {
+    throw errors;
+  }
+};
+
+export const getAllParticipants = async (
+  client: RedisClient,
+  roomId: string,
+) => {
+  const participantIds = await getAllParticipantIds(client, roomId);
+  const participants: Participant[] = [];
+  for (const participantId of participantIds) {
+    const [
+      nickname,
+      peerId,
+      isHost,
+      isDisconnected,
+      muteAudio,
+      muteSpeaker,
+      mutedAudio,
+      mutedSpeaker,
+    ] = await getParticipant(
+      client,
+      roomId,
+      participantId,
+      "nickname",
+      "peerId",
+      "isHost",
+      "isDisconnected",
+      "muteAudio",
+      "muteSpeaker",
+      "mutedAudio",
+      "mutedSpeaker",
+    );
+    participants.push({
+      participantId,
+      nickname,
+      peerId,
+      isHost: isHost === "true",
+      isDisconnected: isDisconnected === "true",
+      muteAudio: muteAudio === "true",
+      muteSpeaker: muteSpeaker === "true",
+      mutedAudio: mutedAudio === "true",
+      mutedSpeaker: mutedSpeaker === "true",
+    });
+  }
+  return participants;
 };

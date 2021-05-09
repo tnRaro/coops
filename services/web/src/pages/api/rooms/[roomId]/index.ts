@@ -58,8 +58,13 @@ import { ModelError } from "../../../../app/errors/ModelError";
 import { apiRouter } from "../../../../app/utils/apiRouter";
 import { HttpResult } from "../../../../app/utils/HttpResult";
 import { UnauthorizedError } from "../../../../auth/errors/UnauthorizedError";
-import { isHost, isParticipant } from "../../../../redis/models/participants";
-import { resetRoom } from "../../../../redis/models/rooms";
+import {
+  getAllParticipants,
+  hasParticipantId,
+  isHost,
+  Participant,
+} from "../../../../redis/models/participants";
+import { getRoom, resetRoom } from "../../../../redis/models/rooms";
 import { getRedisClient } from "../../../../redis/utils/getRedisClient";
 
 interface Query {
@@ -77,20 +82,52 @@ export default apiRouter({
       throw new HttpError(400);
     }
     const roomId = req.query.roomId;
-    if (req.headers.authorization == null) {
-      throw new UnauthorizedError(`Access to the room: ${roomId}`);
-    }
-    const [method, author] = req.headers.authorization.split(/\s+/);
-    if (method !== "X-API-KEY") {
-      throw new UnauthorizedError(`Access to the room: ${roomId}`);
-    }
     const [redis, quit] = getRedisClient();
     try {
-      if (!(await isParticipant(redis, roomId, author))) {
-        throw new HttpError(401);
+      const [title, description, maximumParticipants] = await getRoom(
+        redis,
+        roomId,
+        "title",
+        "description",
+        "maximumParticipants",
+      );
+      if (title == null) {
+        throw new HttpError(404);
+      }
+      let hasAuth = false;
+      if (req.headers.authorization != null) {
+        const [method, participantId] = req.headers.authorization.split(/\s+/);
+        if (method === "X-API-KEY") {
+          if (hasParticipantId(redis, roomId, participantId)) {
+            hasAuth = true;
+          } else {
+            throw new HttpError(403);
+          }
+        }
+      }
+      const result = {
+        roomId,
+        title,
+        description,
+        maximumParticipants:
+          maximumParticipants == null ? null : Number(maximumParticipants),
+        participants: [],
+        chats: [],
+      } as {
+        roomId: string;
+        title: string;
+        description: string;
+        maximumParticipants: number;
+        participants: Participant[];
+        chats: string[];
+      };
+      if (hasAuth) {
+        const participants = await getAllParticipants(redis, roomId);
+        // const chats = Not implemented
+        result.participants = participants;
       }
       await quit();
-      return new HttpResult({ roomId }, 201);
+      return new HttpResult(result, 200);
     } catch (error) {
       await quit();
       if (error instanceof ModelError) {
@@ -107,13 +144,13 @@ export default apiRouter({
     if (req.headers.authorization == null) {
       throw new UnauthorizedError(`Access to the room: ${beforeRoomId}`);
     }
-    const [method, author] = req.headers.authorization.split(/\s+/);
+    const [method, participantId] = req.headers.authorization.split(/\s+/);
     if (method !== "X-API-KEY") {
       throw new UnauthorizedError(`Access to the room: ${beforeRoomId}`);
     }
     const [redis, quit] = getRedisClient();
     try {
-      if (!(await isHost(redis, beforeRoomId, author))) {
+      if (!(await isHost(redis, beforeRoomId, participantId))) {
         throw new HttpError(403);
       }
       const roomId = await resetRoom(redis, beforeRoomId);

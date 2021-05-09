@@ -3,7 +3,11 @@ import { RedisClient } from "redis";
 import { ModelError } from "../../app/errors/ModelError";
 import { genInviteCode } from "../utils/inviteCodeGenerator";
 
+// eslint-disable-next-line import/no-cycle
+import { clearParticipantsFromRoom } from "./participants";
+
 interface Room {
+  roomId: string;
   title: string;
   description?: string;
   maximumParticipants?: string;
@@ -36,7 +40,7 @@ export const getRoom = <TFields extends (keyof Room)[]>(
 ) => {
   type TResults = { [index in keyof TFields]: string };
   return new Promise<TResults>((resolve, reject) => {
-    client.hmget(useRoomKey(roomId), fields.join(" "), (error, reply) => {
+    client.hmget(useRoomKey(roomId), fields, (error, reply) => {
       if (error) {
         return reject(error);
       }
@@ -67,6 +71,7 @@ export const createRoom = async (client: RedisClient, title: string) => {
     throw new ModelError(409);
   }
   await addRoom(client, roomId, {
+    roomId,
     title,
   });
   return roomId;
@@ -74,6 +79,7 @@ export const createRoom = async (client: RedisClient, title: string) => {
 
 export const resetRoom = async (client: RedisClient, beforeRoomId: string) => {
   const [title] = await getRoom(client, beforeRoomId, "title");
+  await clearParticipantsFromRoom(client, beforeRoomId);
   await removeRoom(client, beforeRoomId);
   const roomId = await createRoom(client, title);
   return roomId;

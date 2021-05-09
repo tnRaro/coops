@@ -1,5 +1,6 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
+import { UnauthorizedError } from "../../auth/errors/UnauthorizedError";
 import { CoopsError } from "../errors/CoopsError";
 import { HttpError } from "../errors/HttpError";
 
@@ -34,6 +35,9 @@ export const apiRouter = (handlers: ApiHandlers): NextApiHandler => {
       })
       .catch((error: CoopsError) => {
         if (error instanceof HttpError) {
+          if (error instanceof UnauthorizedError) {
+            res.setHeader("WWW-Authenticate", error.realm);
+          }
           res.status(error.code).send(error.message);
         } else if (error instanceof HttpResult) {
           // eslint-disable-next-line no-console

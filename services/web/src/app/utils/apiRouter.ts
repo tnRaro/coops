@@ -1,7 +1,10 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
+import { UnauthorizedError } from "../../auth/errors/UnauthorizedError";
 import { CoopsError } from "../errors/CoopsError";
 import { HttpError } from "../errors/HttpError";
+
+import { HttpResult } from "./HttpResult";
 
 type ApiHandler<TResult = unknown> = (
   req: NextApiRequest,
@@ -24,11 +27,22 @@ export const apiRouter = (handlers: ApiHandlers): NextApiHandler => {
         if (data == null) {
           res.statusCode = 204;
         }
-        res.send(data);
+        if (data instanceof HttpResult) {
+          res.status(data.code).send(data.body);
+        } else {
+          res.send(data);
+        }
       })
       .catch((error: CoopsError) => {
         if (error instanceof HttpError) {
+          if (error instanceof UnauthorizedError) {
+            res.setHeader("WWW-Authenticate", error.realm);
+          }
           res.status(error.code).send(error.message);
+        } else if (error instanceof HttpResult) {
+          // eslint-disable-next-line no-console
+          console.error("You should not to throw HttpResult.");
+          res.status(500).send("You should not to throw HttpResult.");
         } else {
           // unhandled error
           // eslint-disable-next-line no-console

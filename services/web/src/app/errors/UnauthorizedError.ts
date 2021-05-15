@@ -1,4 +1,4 @@
-import { HttpError } from "../../app/errors/HttpError";
+import { HttpError } from "./HttpError";
 
 export class UnauthorizedError extends HttpError {
   readonly schema: string | null;

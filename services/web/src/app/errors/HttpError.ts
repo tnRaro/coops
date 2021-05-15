@@ -1,7 +1,7 @@
 import { CoopsError } from "./CoopsError";
 
 export class HttpError extends CoopsError {
-  private static readonly codeToMessageMap = {
+  private static readonly httpErrorCodes = {
     200: "OK",
     201: "Created",
     400: "Bad Request",
@@ -15,9 +15,9 @@ export class HttpError extends CoopsError {
     501: "Not Implemented",
   };
 
-  public readonly code: keyof typeof HttpError.codeToMessageMap;
-  constructor(code: keyof typeof HttpError.codeToMessageMap, message?: string) {
-    super(message ?? HttpError.codeToMessageMap[code]);
+  public readonly code: keyof typeof HttpError.httpErrorCodes;
+  constructor(code: keyof typeof HttpError.httpErrorCodes, message?: string) {
+    super(message ?? HttpError.httpErrorCodes[code]);
     this.code = code;
   }
 }

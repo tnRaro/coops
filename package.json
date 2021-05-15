@@ -38,6 +38,8 @@
     "husky:install": "husky install",
     "add-service": "node ./tools/add-service.js",
     "web": "yarn workspace @coops/web",
-    "test": "jest"
+    "test": "jest",
+    "db-rooms": "yarn workspace @coops/db-rooms",
+    "db-participants": "yarn workspace @coops/db-participants"
   }
 }

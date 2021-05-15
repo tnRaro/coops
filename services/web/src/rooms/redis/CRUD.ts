@@ -1,19 +1,13 @@
 import { RedisClient } from "redis";
 
-import { ModelError } from "../../app/errors/ModelError";
-import { genInviteCode } from "../utils/inviteCodeGenerator";
+import { useRoomKey } from "./keys";
+import { Room } from "./types";
 
-// eslint-disable-next-line import/no-cycle
-import { clearParticipantsFromRoom } from "./participants";
-
-interface Room {
-  roomId: string;
-  title: string;
-  description?: string;
-  maximumParticipants?: string;
-}
-const useRoomKey = (roomId: string) => `rooms:${roomId}`;
-export const addRoom = (client: RedisClient, roomId: string, values: Room) => {
+export const addRoom = (
+  client: RedisClient,
+  roomId: string,
+  values: Partial<Room>,
+) => {
   return new Promise<void>((resolve, reject) => {
     client.hmset(useRoomKey(roomId), values as any, (error) => {
       if (error) {
@@ -33,7 +27,7 @@ export const hasRoom = (client: RedisClient, roomId: string) => {
     });
   });
 };
-export const getRoom = <TFields extends (keyof Room)[]>(
+export const findRoomById = <TFields extends (keyof Room)[]>(
   client: RedisClient,
   roomId: string,
   ...fields: TFields
@@ -61,26 +55,4 @@ export const removeRoom = (client: RedisClient, roomId: string) => {
       },
     );
   });
-};
-
-// high-level API
-
-export const createRoom = async (client: RedisClient, title: string) => {
-  const roomId = genInviteCode();
-  if (await hasRoom(client, roomId)) {
-    throw new ModelError(409);
-  }
-  await addRoom(client, roomId, {
-    roomId,
-    title,
-  });
-  return roomId;
-};
-
-export const resetRoom = async (client: RedisClient, beforeRoomId: string) => {
-  const [title] = await getRoom(client, beforeRoomId, "title");
-  await clearParticipantsFromRoom(client, beforeRoomId);
-  await removeRoom(client, beforeRoomId);
-  const roomId = await createRoom(client, title);
-  return roomId;
 };

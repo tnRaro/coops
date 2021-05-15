@@ -7,6 +7,7 @@ const theme = extendTheme({
     global: {
       "html, body": {
         backgroundColor: "elevation.0",
+        color: "text.100",
       },
     },
   },

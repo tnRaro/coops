@@ -1,5 +1,5 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/layout";
-import { Input, Button, Flex, Spacer } from "@chakra-ui/react";
+import { Input, Button, Flex, Spacer, Center } from "@chakra-ui/react";
 import { VoidFunctionComponent } from "react";
 
 type PageProps = unknown;
@@ -14,11 +14,11 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
           placeholder="초대 코드를 입력해주세요"
           _placeholder={{ color: "text.33" }}
           variant="unstyled"
-          height="55px"
           borderRadius="8px"
           backgroundColor="elevation.2"
           textStyle="label1"
           textColor="text.100"
+          padding="4"
           paddingLeft="5"
           marginBottom="2.5"
         />
@@ -26,7 +26,7 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
           backgroundColor="text.10"
           borderRadius="8px"
           width="100%"
-          height="55px"
+          padding="7"
           color="text.66"
           textStyle="label1Bold"
           marginBottom="5"
@@ -34,24 +34,26 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
         >
           방 참가하기
         </Button>
-        <Flex alignItems="center">
-          <Box width="42%" height="1px" background="text.33" />
-          <Spacer />
-          <Text color="text.33" textStyle="label1">
-            또는
-          </Text>
-          <Spacer />
-          <Box width="42%" height="1px" background="text.33" />
+        <Flex display="flex" alignItems="center">
+          <Box flex="1" height="1px" background="text.33" />
+          <Box flex="0.5">
+            <Center>
+              <Text color="text.33" textStyle="label1">
+                또는
+              </Text>
+            </Center>
+          </Box>
+          <Box flex="1" height="1px" background="text.33" />
         </Flex>
         <Input
           placeholder="방 제목을 입력해주세요"
           _placeholder={{ color: "text.33" }}
           variant="unstyled"
-          height="55px"
           borderRadius="8px"
           backgroundColor="elevation.2"
           textStyle="label1"
           textColor="text.100"
+          padding="4"
           paddingLeft="5"
           marginTop="5"
           marginBottom="2.5"
@@ -60,10 +62,10 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
           backgroundColor="primary.10"
           borderRadius="8px"
           width="100%"
-          height="55px"
+          padding="7"
           color="primary.100"
           textStyle="label1Bold"
-          _hover={{ backgroundColor: "primary.33" }}
+          _hover={{ backgroundColor: "text.33" }}
         >
           방 만들기
         </Button>

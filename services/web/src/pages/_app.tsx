@@ -5,7 +5,8 @@ import { VoidFunctionComponent } from "react";
 const theme = extendTheme({
   styles: {
     global: {
-      "html, body": {
+      "html, body, #__next": {
+        height: "100%",
         backgroundColor: "elevation.0",
         color: "text.100",
       },
@@ -13,9 +14,9 @@ const theme = extendTheme({
   },
   layerStyles: {
     card: {
-      backgroundColor:
-        "radial-gradiant(71.72% 56.77% at 0% 0%, rgba(255, 196, 82, 0.1) 0%, rgba(255, 196, 82, 0) 100%), elevation.1",
+      background: "card.100",
       boxShadow: "overlay",
+      borderRadius: "card",
     },
     popOut: {
       backgroundColor: "rgba(39, 43, 47, 0.66)",
@@ -94,9 +95,14 @@ const theme = extendTheme({
       1: "hsl(210 11% 15% / 100%)",
       2: "hsl(210 9% 17% / 100%)",
     },
+    card: {
+      100: "radial-gradient(71.72% 56.77% at 0% 0%, rgba(255, 196, 82, 0.1) 0%, rgba(255, 196, 82, 0) 100%), hsl(210, 11%, 15%)",
+    },
   },
   fonts: {
     sans: "Noto Sans KR, sans-serif",
+    heading: "var(--chakra-fonts-sans)",
+    body: "var(--chakra-fonts-sans)",
   },
   fontSizes: {
     heading1: "40px",
@@ -118,8 +124,11 @@ const theme = extendTheme({
   },
   shadows: {
     raised: "0px 2px 1px rgba(0, 0, 0, 0.1)",
-    overlay: "0px 4px 8px rgba(0, 0, 0, 0.1",
+    overlay: "0px 4px 8px rgba(0, 0, 0, 0.1)",
     popOut: "0px 12px 24px rgba(0, 0, 0, 0.1)",
+  },
+  radii: {
+    card: "20px",
   },
 });
 

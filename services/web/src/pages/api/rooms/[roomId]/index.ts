@@ -54,37 +54,26 @@
  */
 
 import { HttpError } from "../../../../app/errors/HttpError";
-import { ModelError } from "../../../../app/errors/ModelError";
 import { apiRouter } from "../../../../app/utils/apiRouter";
+import { auth } from "../../../../app/utils/auth";
 import { HttpResult } from "../../../../app/utils/HttpResult";
-import { UnauthorizedError } from "../../../../auth/errors/UnauthorizedError";
-import {
-  getAllParticipants,
-  hasParticipantId,
-  isHost,
-  Participant,
-} from "../../../../redis/models/participants";
-import { getRoom, resetRoom } from "../../../../redis/models/rooms";
-import { getRedisClient } from "../../../../redis/utils/getRedisClient";
+import { isRoomIdQuery } from "../../../../app/utils/queries";
+import { findAllParticipants } from "../../../../participants/logic/findAllParticipants";
+import { validateHost } from "../../../../participants/logic/validateHost";
+import { hasParticipantId } from "../../../../participants/redis/CRUD/hasParticipantId";
+import { Participant } from "../../../../participants/redis/types";
+import { withRedisClient } from "../../../../redis/utils/withRedisClient";
+import { resetRoom } from "../../../../rooms/logic/resetRoom";
+import { findRoomById } from "../../../../rooms/redis/CRUD";
 
-interface Query {
-  roomId: string;
-}
-const isQuery = (query: unknown): query is Query => {
-  if (query == null) {
-    return false;
-  }
-  return typeof (query as Query).roomId === "string";
-};
 export default apiRouter({
   GET: async (req, res) => {
-    if (!isQuery(req.query)) {
+    if (!isRoomIdQuery(req.query)) {
       throw new HttpError(400);
     }
-    const roomId = req.query.roomId;
-    const [redis, quit] = getRedisClient();
-    try {
-      const [title, description, maximumParticipants] = await getRoom(
+    const { roomId } = req.query;
+    return withRedisClient(async (redis) => {
+      const [title, description, maximumParticipants] = await findRoomById(
         redis,
         roomId,
         "title",
@@ -122,46 +111,23 @@ export default apiRouter({
         chats: string[];
       };
       if (hasAuth) {
-        const participants = await getAllParticipants(redis, roomId);
+        const participants = await findAllParticipants(redis, roomId);
         // const chats = Not implemented
         result.participants = participants;
       }
-      await quit();
       return new HttpResult(result, 200);
-    } catch (error) {
-      await quit();
-      if (error instanceof ModelError) {
-        throw new HttpError(error.code, error.message);
-      }
-      throw error;
-    }
+    });
   },
   PUT: async (req, res) => {
-    if (!isQuery(req.query)) {
+    if (!isRoomIdQuery(req.query)) {
       throw new HttpError(400);
     }
     const beforeRoomId = req.query.roomId;
-    if (req.headers.authorization == null) {
-      throw new UnauthorizedError(`Access to the room: ${beforeRoomId}`);
-    }
-    const [method, participantId] = req.headers.authorization.split(/\s+/);
-    if (method !== "X-API-KEY") {
-      throw new UnauthorizedError(`Access to the room: ${beforeRoomId}`);
-    }
-    const [redis, quit] = getRedisClient();
-    try {
-      if (!(await isHost(redis, beforeRoomId, participantId))) {
-        throw new HttpError(403);
-      }
+    const authorId = auth(req, `Access to the room: ${beforeRoomId}`);
+    return withRedisClient(async (redis) => {
+      await validateHost(redis, beforeRoomId, authorId);
       const roomId = await resetRoom(redis, beforeRoomId);
-      await quit();
       return new HttpResult({ roomId }, 201);
-    } catch (error) {
-      await quit();
-      if (error instanceof ModelError) {
-        throw new HttpError(error.code, error.message);
-      }
-      throw error;
-    }
+    });
   },
 });

@@ -15,38 +15,24 @@
  */
 
 import { HttpError } from "../../../../app/errors/HttpError";
-import { ModelError } from "../../../../app/errors/ModelError";
+import { LogicError } from "../../../../app/errors/LogicError";
 import { apiRouter } from "../../../../app/utils/apiRouter";
 import { HttpResult } from "../../../../app/utils/HttpResult";
-import { createRoom } from "../../../../redis/models/rooms";
+import { isTitleQuery } from "../../../../app/utils/queries";
 import { getRedisClient } from "../../../../redis/utils/getRedisClient";
-
-interface Query {
-  title: string;
-}
-const isQuery = (query: unknown): query is Query => {
-  if (query == null) {
-    return false;
-  }
-  return typeof (query as Query).title === "string";
-};
+import { withRedisClient } from "../../../../redis/utils/withRedisClient";
+import { createRoom } from "../../../../rooms/logic/createRoom";
 
 export default apiRouter({
   POST: async (req, res) => {
-    if (!isQuery(req.query)) {
+    if (!isTitleQuery(req.query)) {
       throw new HttpError(400);
     }
-    const [redis, quit] = getRedisClient();
-    try {
-      const roomId = await createRoom(redis, req.query.title);
-      await quit();
+    const { title } = req.query;
+
+    return withRedisClient(async (redis) => {
+      const roomId = await createRoom(redis, title);
       return new HttpResult({ roomId }, 201);
-    } catch (error) {
-      await quit();
-      if (error instanceof ModelError) {
-        throw new HttpError(error.code, error.message);
-      }
-      throw error;
-    }
+    });
   },
 });

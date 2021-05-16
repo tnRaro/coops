@@ -16,12 +16,80 @@
 
 import { HttpError } from "../../../../../../app/errors/HttpError";
 import { apiRouter } from "../../../../../../app/utils/apiRouter";
+import { auth } from "../../../../../../app/utils/auth";
+import { isParticipantQuery } from "../../../../../../app/utils/queries";
+import { findParticipantByNickname } from "../../../../../../participants/logic/findParticipantByNickname";
+import { isHost } from "../../../../../../participants/logic/validateHost";
+import { addParticipant } from "../../../../../../participants/redis/CRUD/addParticipant";
+import { withRedisClient } from "../../../../../../redis/utils/withRedisClient";
 
 export default apiRouter({
   PUT: async (req, res) => {
-    throw new HttpError(501);
+    if (!isParticipantQuery(req.query)) {
+      throw new HttpError(400);
+    }
+    const { roomId, nickname } = req.query;
+    const authorId = auth(req, `Access to the room: ${roomId}`);
+    return withRedisClient(async (redis) => {
+      const participant = await findParticipantByNickname(
+        redis,
+        roomId,
+        nickname,
+      );
+      if (participant == null) {
+        throw new HttpError(404);
+      }
+      let serverMode = false;
+      if (participant.participantId !== authorId) {
+        if (await isHost(redis, roomId, authorId)) {
+          serverMode = true;
+        } else {
+          throw new HttpError(403);
+        }
+      }
+      if (serverMode) {
+        addParticipant(redis, roomId, participant.participantId, {
+          mutedAudio: false,
+        });
+      } else {
+        addParticipant(redis, roomId, participant.participantId, {
+          muteAudio: false,
+        });
+      }
+    });
   },
   DELETE: async (req, res) => {
-    throw new HttpError(501);
+    if (!isParticipantQuery(req.query)) {
+      throw new HttpError(400);
+    }
+    const { roomId, nickname } = req.query;
+    const authorId = auth(req, `Access to the room: ${roomId}`);
+    return withRedisClient(async (redis) => {
+      const participant = await findParticipantByNickname(
+        redis,
+        roomId,
+        nickname,
+      );
+      if (participant == null) {
+        throw new HttpError(404);
+      }
+      let serverMode = false;
+      if (participant.participantId !== authorId) {
+        if (await isHost(redis, roomId, authorId)) {
+          serverMode = true;
+        } else {
+          throw new HttpError(403);
+        }
+      }
+      if (serverMode) {
+        addParticipant(redis, roomId, participant.participantId, {
+          mutedAudio: true,
+        });
+      } else {
+        addParticipant(redis, roomId, participant.participantId, {
+          muteAudio: true,
+        });
+      }
+    });
   },
 });

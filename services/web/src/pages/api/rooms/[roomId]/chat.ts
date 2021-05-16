@@ -20,9 +20,12 @@
 
 import { HttpError } from "../../../../app/errors/HttpError";
 import { apiRouter } from "../../../../app/utils/apiRouter";
+import { withRedisClient } from "../../../../redis/utils/withRedisClient";
 
 export default apiRouter({
   POST: async (req, res) => {
-    throw new HttpError(501);
+    return withRedisClient(async (redis) => {
+      throw new HttpError(501);
+    });
   },
 });

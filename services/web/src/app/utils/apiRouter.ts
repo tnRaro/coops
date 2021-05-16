@@ -1,6 +1,6 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 
-import { UnauthorizedError } from "../../auth/errors/UnauthorizedError";
+import { UnauthorizedError } from "../errors/UnauthorizedError";
 import { CoopsError } from "../errors/CoopsError";
 import { HttpError } from "../errors/HttpError";
 

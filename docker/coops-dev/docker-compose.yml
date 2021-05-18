@@ -5,7 +5,7 @@ services:
     command: yarn web dev
     build:
       context: ../../
-      dockerfile: docker/coops-dev/Dockerfile
+      dockerfile: Dockerfile
       target: "web"
     working_dir: /app
     env_file: "../../services/web/.env.local"

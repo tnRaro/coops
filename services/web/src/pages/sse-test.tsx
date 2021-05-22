@@ -5,9 +5,12 @@ import { useEffect, VoidFunctionComponent } from "react";
 type PageProps = unknown;
 const Page: VoidFunctionComponent<PageProps> = (props) => {
   useEffect(() => {
-    const eventSource = new EventSource("http://localhost:5353/sse", {
-      withCredentials: true,
-    });
+    const eventSource = new EventSource(
+      "http://localhost:5353/api/rooms/535353/stream?key=53",
+      {
+        withCredentials: true,
+      },
+    );
     eventSource.onmessage = (event) => {
       console.log(event.type, event.data);
     };

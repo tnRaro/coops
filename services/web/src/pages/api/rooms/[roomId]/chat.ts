@@ -18,13 +18,14 @@
  * ```
  */
 
-import { HttpError } from "../../../../app/errors/HttpError";
+import { HttpError } from "@coops/error";
+import { withRedisClient } from "@coops/redis";
+
 import { apiRouter } from "../../../../app/utils/apiRouter";
-import { withRedisClient } from "../../../../redis/utils/withRedisClient";
 
 export default apiRouter({
   POST: async (req, res) => {
-    return withRedisClient(async (redis) => {
+    return withRedisClient(async (client) => {
       throw new HttpError(501);
     });
   },

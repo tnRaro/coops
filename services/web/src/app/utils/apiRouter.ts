@@ -1,10 +1,6 @@
+import { HttpResult } from "@coops/core";
+import { CoopsError, HttpError, UnauthorizedError } from "@coops/error";
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-
-import { UnauthorizedError } from "../errors/UnauthorizedError";
-import { CoopsError } from "../errors/CoopsError";
-import { HttpError } from "../errors/HttpError";
-
-import { HttpResult } from "./HttpResult";
 
 type ApiHandler<TResult = unknown> = (
   req: NextApiRequest,

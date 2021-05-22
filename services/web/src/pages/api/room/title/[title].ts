@@ -14,14 +14,13 @@
  * ```
  */
 
-import { HttpError } from "../../../../app/errors/HttpError";
-import { LogicError } from "../../../../app/errors/LogicError";
+import { HttpResult } from "@coops/core";
+import { HttpError } from "@coops/error";
+import { withRedisClient } from "@coops/redis";
+import * as logic from "@coops/logic";
+
 import { apiRouter } from "../../../../app/utils/apiRouter";
-import { HttpResult } from "../../../../app/utils/HttpResult";
 import { isTitleQuery } from "../../../../app/utils/queries";
-import { getRedisClient } from "../../../../redis/utils/getRedisClient";
-import { withRedisClient } from "../../../../redis/utils/withRedisClient";
-import { createRoom } from "../../../../rooms/logic/createRoom";
 
 export default apiRouter({
   POST: async (req, res) => {
@@ -30,8 +29,8 @@ export default apiRouter({
     }
     const { title } = req.query;
 
-    return withRedisClient(async (redis) => {
-      const roomId = await createRoom(redis, title);
+    return withRedisClient(async (client) => {
+      const roomId = await logic.room.createRoom(client, title);
       return new HttpResult({ roomId }, 201);
     });
   },

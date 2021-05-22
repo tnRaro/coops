@@ -7,6 +7,8 @@ services:
       context: ../../
       dockerfile: Dockerfile
       target: "web"
+      args:
+        ENV: development
     working_dir: /app
     env_file: "../../services/web/.env.local"
     ports:
@@ -20,6 +22,8 @@ services:
       context: ../../
       dockerfile: Dockerfile
       target: "sse"
+      args:
+        ENV: development
     working_dir: /app
     ports:
       - 5353:5353

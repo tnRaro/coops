@@ -53,18 +53,15 @@
  * ```
  */
 
-import { HttpError } from "../../../../app/errors/HttpError";
+import { HttpResult } from "@coops/core";
+import { HttpError } from "@coops/error";
+import { withRedisClient } from "@coops/redis";
+import * as redis from "@coops/redis";
+import * as logic from "@coops/logic";
+
 import { apiRouter } from "../../../../app/utils/apiRouter";
 import { auth } from "../../../../app/utils/auth";
-import { HttpResult } from "../../../../app/utils/HttpResult";
 import { isRoomIdQuery } from "../../../../app/utils/queries";
-import { findAllParticipants } from "../../../../participants/logic/findAllParticipants";
-import { validateHost } from "../../../../participants/logic/validateHost";
-import { hasParticipantId } from "../../../../participants/redis/CRUD/hasParticipantId";
-import { Participant } from "../../../../participants/redis/types";
-import { withRedisClient } from "../../../../redis/utils/withRedisClient";
-import { resetRoom } from "../../../../rooms/logic/resetRoom";
-import { findRoomById } from "../../../../rooms/redis/CRUD";
 
 export default apiRouter({
   GET: async (req, res) => {
@@ -72,9 +69,13 @@ export default apiRouter({
       throw new HttpError(400);
     }
     const { roomId } = req.query;
-    return withRedisClient(async (redis) => {
-      const [title, description, maximumParticipants] = await findRoomById(
-        redis,
+    return withRedisClient(async (client) => {
+      const [
+        title,
+        description,
+        maximumParticipants,
+      ] = await redis.room.CRUD.findRoomById(
+        client,
         roomId,
         "title",
         "description",
@@ -87,7 +88,13 @@ export default apiRouter({
       if (req.headers.authorization != null) {
         const [method, participantId] = req.headers.authorization.split(/\s+/);
         if (method === "X-API-KEY") {
-          if (hasParticipantId(redis, roomId, participantId)) {
+          if (
+            redis.participant.CRUD.hasParticipantId(
+              client,
+              roomId,
+              participantId,
+            )
+          ) {
             hasAuth = true;
           } else {
             throw new HttpError(403);
@@ -107,11 +114,14 @@ export default apiRouter({
         title: string;
         description: string;
         maximumParticipants: number;
-        participants: Participant[];
+        participants: redis.participant.types.Participant[];
         chats: string[];
       };
       if (hasAuth) {
-        const participants = await findAllParticipants(redis, roomId);
+        const participants = await logic.participant.findAllParticipants(
+          client,
+          roomId,
+        );
         // const chats = Not implemented
         result.participants = participants;
       }
@@ -124,9 +134,9 @@ export default apiRouter({
     }
     const beforeRoomId = req.query.roomId;
     const authorId = auth(req, `Access to the room: ${beforeRoomId}`);
-    return withRedisClient(async (redis) => {
-      await validateHost(redis, beforeRoomId, authorId);
-      const roomId = await resetRoom(redis, beforeRoomId);
+    return withRedisClient(async (client) => {
+      await logic.participant.validateHost(client, beforeRoomId, authorId);
+      const roomId = await logic.room.resetRoom(client, beforeRoomId);
       return new HttpResult({ roomId }, 201);
     });
   },

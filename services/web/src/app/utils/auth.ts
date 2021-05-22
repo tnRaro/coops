@@ -1,6 +1,5 @@
+import { UnauthorizedError } from "@coops/error";
 import { NextApiRequest } from "next";
-
-import { UnauthorizedError } from "../errors/UnauthorizedError";
 
 export const auth = (req: NextApiRequest, realm: string) => {
   if (req.headers.authorization == null) {

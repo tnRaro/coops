@@ -14,14 +14,14 @@
  * - no room: 404
  */
 
-import { HttpError } from "../../../../../../app/errors/HttpError";
+import { HttpError } from "@coops/error";
+import { withRedisClient } from "@coops/redis";
+import * as redis from "@coops/redis";
+import * as logic from "@coops/logic";
+
 import { apiRouter } from "../../../../../../app/utils/apiRouter";
 import { auth } from "../../../../../../app/utils/auth";
 import { isParticipantQuery } from "../../../../../../app/utils/queries";
-import { findParticipantByNickname } from "../../../../../../participants/logic/findParticipantByNickname";
-import { isHost } from "../../../../../../participants/logic/validateHost";
-import { addParticipant } from "../../../../../../participants/redis/CRUD/addParticipant";
-import { withRedisClient } from "../../../../../../redis/utils/withRedisClient";
 
 export default apiRouter({
   PUT: async (req, res) => {
@@ -30,9 +30,9 @@ export default apiRouter({
     }
     const { roomId, nickname } = req.query;
     const authorId = auth(req, `Access to the room: ${roomId}`);
-    return withRedisClient(async (redis) => {
-      const participant = await findParticipantByNickname(
-        redis,
+    return withRedisClient(async (client) => {
+      const participant = await logic.participant.findParticipantByNickname(
+        client,
         roomId,
         nickname,
       );
@@ -41,20 +41,30 @@ export default apiRouter({
       }
       let serverMode = false;
       if (participant.participantId !== authorId) {
-        if (await isHost(redis, roomId, authorId)) {
+        if (await logic.participant.isHost(client, roomId, authorId)) {
           serverMode = true;
         } else {
           throw new HttpError(403);
         }
       }
       if (serverMode) {
-        addParticipant(redis, roomId, participant.participantId, {
-          mutedSpeaker: false,
-        });
+        redis.participant.CRUD.addParticipant(
+          client,
+          roomId,
+          participant.participantId,
+          {
+            mutedSpeaker: false,
+          },
+        );
       } else {
-        addParticipant(redis, roomId, participant.participantId, {
-          muteSpeaker: false,
-        });
+        redis.participant.CRUD.addParticipant(
+          client,
+          roomId,
+          participant.participantId,
+          {
+            muteSpeaker: false,
+          },
+        );
       }
     });
   },
@@ -64,9 +74,9 @@ export default apiRouter({
     }
     const { roomId, nickname } = req.query;
     const authorId = auth(req, `Access to the room: ${roomId}`);
-    return withRedisClient(async (redis) => {
-      const participant = await findParticipantByNickname(
-        redis,
+    return withRedisClient(async (client) => {
+      const participant = await logic.participant.findParticipantByNickname(
+        client,
         roomId,
         nickname,
       );
@@ -75,20 +85,30 @@ export default apiRouter({
       }
       let serverMode = false;
       if (participant.participantId !== authorId) {
-        if (await isHost(redis, roomId, authorId)) {
+        if (await logic.participant.isHost(client, roomId, authorId)) {
           serverMode = true;
         } else {
           throw new HttpError(403);
         }
       }
       if (serverMode) {
-        addParticipant(redis, roomId, participant.participantId, {
-          mutedSpeaker: true,
-        });
+        redis.participant.CRUD.addParticipant(
+          client,
+          roomId,
+          participant.participantId,
+          {
+            mutedSpeaker: true,
+          },
+        );
       } else {
-        addParticipant(redis, roomId, participant.participantId, {
-          muteSpeaker: true,
-        });
+        redis.participant.CRUD.addParticipant(
+          client,
+          roomId,
+          participant.participantId,
+          {
+            muteSpeaker: true,
+          },
+        );
       }
     });
   },

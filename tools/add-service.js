@@ -43,7 +43,22 @@ const templates = {
       name: packageName,
       private: true,
       version: "1.0.0",
+      main: "./dist/index.js",
+      types: "./dist/index.d.ts",
+      scripts: {
+        build: "node build.js",
+        types: "tsc --project tsconfig.json",
+      },
     }),
+    "tsconfig.json": JSON.stringify({
+      extends: "../../tsconfig.json",
+      compilerOptions: {
+        rootDir: "./src",
+        emitDeclarationOnly: true,
+        outDir: "./dist",
+      },
+    }),
+    "build.js": `require("../../tools/build")(__dirname);\n`,
   },
   dirs: ["src"],
 };

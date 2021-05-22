@@ -40,6 +40,7 @@
     "web": "yarn workspace @coops/web",
     "test": "jest",
     "db-rooms": "yarn workspace @coops/db-rooms",
-    "db-participants": "yarn workspace @coops/db-participants"
+    "db-participants": "yarn workspace @coops/db-participants",
+    "sse": "yarn workspace @coops/sse"
   }
 }

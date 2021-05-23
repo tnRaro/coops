@@ -9,5 +9,8 @@ export const auth = (req: NextApiRequest, realm: string) => {
   if (method !== "X-API-KEY") {
     throw new UnauthorizedError(realm);
   }
+  if (authorId == null) {
+    throw new UnauthorizedError(realm);
+  }
   return authorId;
 };

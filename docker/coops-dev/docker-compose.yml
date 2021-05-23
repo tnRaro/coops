@@ -5,8 +5,10 @@ services:
     command: yarn web dev
     build:
       context: ../../
-      dockerfile: docker/coops-dev/Dockerfile
+      dockerfile: Dockerfile
       target: "web"
+      args:
+        ENV: development
     working_dir: /app
     env_file: "../../services/web/.env.local"
     ports:
@@ -14,6 +16,17 @@ services:
     volumes:
       - ../../services/web/src:/app/services/web/src
       - ../../services/web/public:/app/services/web/public
+  sse:
+    command: node ./services/sse/dist/index.js
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+      target: "sse"
+      args:
+        ENV: development
+    working_dir: /app
+    ports:
+      - 5353:5353
   peer:
     image: peerjs/peerjs-server
     command: --port 9000 --path /
@@ -21,3 +34,9 @@ services:
       - 9000:9000
   redis:
     image: redis:6.2.3-alpine
+  redis-commender:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - 8081:8081

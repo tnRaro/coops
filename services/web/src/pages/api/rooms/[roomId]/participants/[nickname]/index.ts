@@ -29,17 +29,15 @@
  * - no room or no user: 404
  */
 
-import { HttpError } from "../../../../../../app/errors/HttpError";
+import { HttpResult } from "@coops/core";
+import { HttpError } from "@coops/error";
+import { withRedisClient } from "@coops/redis";
+import * as redis from "@coops/redis";
+import * as logic from "@coops/logic";
+
 import { apiRouter } from "../../../../../../app/utils/apiRouter";
 import { auth } from "../../../../../../app/utils/auth";
-import { HttpResult } from "../../../../../../app/utils/HttpResult";
 import { isParticipantQuery } from "../../../../../../app/utils/queries";
-import { enterParticipant } from "../../../../../../participants/logic/enterParticipant";
-import { removeParticipantById } from "../../../../../../participants/logic/removeParticipantById";
-import { validateHost } from "../../../../../../participants/logic/validateHost";
-import { findAllParticipantIds } from "../../../../../../participants/redis/CRUD/findAllParticipantIds";
-import { findParticipant } from "../../../../../../participants/redis/CRUD/findParticipant";
-import { withRedisClient } from "../../../../../../redis/utils/withRedisClient";
 
 export default apiRouter({
   POST: async (req, res) => {
@@ -47,8 +45,12 @@ export default apiRouter({
       throw new HttpError(400);
     }
     const { roomId, nickname } = req.query;
-    return withRedisClient(async (redis) => {
-      const participant = await enterParticipant(redis, roomId, nickname);
+    return withRedisClient(async (client) => {
+      const participant = await logic.participant.enterParticipant(
+        client,
+        roomId,
+        nickname,
+      );
       return new HttpResult(participant, 201);
     });
   },
@@ -58,18 +60,25 @@ export default apiRouter({
     }
     const { roomId } = req.query;
     const authorId = auth(req, `Access to the room: ${roomId}`);
-    return withRedisClient(async (redis) => {
-      await validateHost(redis, roomId, authorId);
-      const participantIds = await findAllParticipantIds(redis, roomId);
+    return withRedisClient(async (client) => {
+      await logic.participant.validateHost(client, roomId, authorId);
+      const participantIds = await redis.participant.CRUD.findAllParticipantIds(
+        client,
+        roomId,
+      );
       for (const participantId of participantIds) {
-        const [nickname] = await findParticipant(
-          redis,
+        const [nickname] = await redis.participant.CRUD.findParticipant(
+          client,
           roomId,
           participantId,
           "nickname",
         );
         if (nickname === req.query.nickname) {
-          await removeParticipantById(redis, roomId, participantId);
+          await logic.participant.removeParticipantById(
+            client,
+            roomId,
+            participantId,
+          );
           break;
         }
       }

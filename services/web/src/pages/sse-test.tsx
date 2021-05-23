@@ -17,6 +17,9 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
     eventSource.addEventListener("li dailin", (event) => {
       console.log("li dailin", event);
     });
+    eventSource.addEventListener("chat", (event) => {
+      console.log("chat", event);
+    });
     eventSource.onerror = (error) => {
       console.error(error);
       eventSource.close();

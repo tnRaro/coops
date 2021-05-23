@@ -1,8 +1,10 @@
+/* eslint-disable require-atomic-updates */
 import { PassThrough } from "stream";
 
-import { HttpError, UnauthorizedError } from "@coops/error";
+import { HttpError, LogicError, UnauthorizedError } from "@coops/error";
 import * as logic from "@coops/logic";
-import { withRedisClient } from "@coops/redis";
+import * as redis from "@coops/redis";
+import { getRedisClient } from "@coops/redis";
 import cors from "@koa/cors";
 import Koa from "koa";
 
@@ -21,6 +23,7 @@ koa.use(async (context, next) => {
   if (!pathReg.test(context.path)) {
     return next();
   }
+  const [client, quit] = getRedisClient();
   try {
     const { key } = context.query;
     const [_, roomId] = context.path.match(pathReg)!;
@@ -28,46 +31,61 @@ koa.use(async (context, next) => {
       throw new UnauthorizedError(`Access to the room: ${roomId}`);
     }
     const authorId = key as string;
-
-    return await withRedisClient(async (client) => {
-      if (!(await logic.participant.isParticipant(client, roomId, authorId))) {
-        throw new HttpError(403);
+    if (!(await logic.participant.isParticipant(client, roomId, authorId))) {
+      throw new HttpError(403);
+    }
+    const chatKey = redis.chat.useChatKey(roomId);
+    await redis.pubsub.sub(client, chatKey);
+    context.request.socket.setTimeout(0);
+    context.req.socket.setNoDelay(true);
+    context.req.socket.setKeepAlive(true);
+    context.set("Content-Type", "text/event-stream");
+    context.set("Cache-Control", "no-cache");
+    context.set("Connection", "keep-alive");
+    const stream = new PassThrough();
+    context.status = 200;
+    context.body = stream;
+    let isRunning = true;
+    const say = (message: string, event?: string) => {
+      if (!isRunning) {
+        return;
       }
-      context.request.socket.setTimeout(0);
-      context.req.socket.setNoDelay(true);
-      context.req.socket.setKeepAlive(true);
-      context.set("Content-Type", "text/event-stream");
-      context.set("Cache-Control", "no-cache");
-      context.set("Connection", "keep-alive");
-      const stream = new PassThrough();
-      context.status = 200;
-      context.body = stream;
-      let isRunning = true;
-      stream.on("close", () => {
-        isRunning = false;
+      if (event != null) {
+        stream.write(`event: ${event}\n`);
+      }
+      stream.write(`data: ${message}\n\n`);
+    };
+    client.on("message", (channel, message) => {
+      switch (channel) {
+        case chatKey: {
+          say(message, "chat");
+          break;
+        }
+        default: {
+          // eslint-disable-next-line no-console
+          console.error(channel, message);
+        }
+      }
+    });
+    stream.on("close", () => {
+      isRunning = false;
+      client.unsubscribe(chatKey, (error, reply) => {
+        if (error) {
+          // eslint-disable-next-line no-console
+          console.error(error);
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(reply);
+        }
+        quit();
       });
-      const say = (message: string, event?: string) => {
-        if (!isRunning) {
-          return;
-        }
-        if (event != null) {
-          stream.write(`event: ${event}\n`);
-        }
-        stream.write(`data: ${message}\n\n`);
-      };
-      setTimeout(() => {
-        say("취호격파산!");
-        setTimeout(() => {
-          say("취호격파산!");
-          setTimeout(() => {
-            say("취호격파산!", "li dailin");
-            stream.end();
-          }, 1000);
-        }, 1000);
-      }, 1000);
     });
   } catch (error: unknown) {
-    if (error instanceof HttpError) {
+    await quit();
+    if (error instanceof LogicError) {
+      context.status = error.code;
+      context.body = error.message;
+    } else if (error instanceof HttpError) {
       if (error instanceof UnauthorizedError) {
         context.set("WWW-Authenticate", error.realm);
       }

@@ -125,8 +125,9 @@ export default apiRouter({
           client,
           roomId,
         );
-        // const chats = Not implemented
         result.participants = participants;
+        const chats = await logic.chat.findAllChats(client, roomId);
+        result.chats = chats.map((chat) => JSON.stringify(chat));
       }
       return new HttpResult(result, 200);
     });

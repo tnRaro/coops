@@ -1,3 +1,4 @@
+import { consts } from "@coops/core";
 import { LogicError } from "@coops/error";
 import * as redis from "@coops/redis";
 import { RedisClient } from "redis";
@@ -10,6 +11,12 @@ export const enterParticipant = async (
   roomId: string,
   nickname: string,
 ) => {
+  if (
+    nickname.length > consts.participant.nickname.length.max ||
+    nickname.length < consts.participant.nickname.length.min
+  ) {
+    throw new LogicError(400);
+  }
   if (!(await redis.room.CRUD.hasRoom(client, roomId))) {
     throw new LogicError(404);
   }

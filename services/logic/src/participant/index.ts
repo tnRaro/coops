@@ -5,4 +5,5 @@ export { findParticipantByNickname } from "./findParticipantByNickname";
 export { hasParticipant } from "./hasParticipant";
 export { isParticipant } from "./isParticipant";
 export { removeParticipantById } from "./removeParticipantById";
+export { setParticipant } from "./setParticipant";
 export { validateHost, isHost } from "./validateHost";

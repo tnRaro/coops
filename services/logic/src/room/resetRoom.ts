@@ -13,6 +13,7 @@ export const resetRoom = async (client: RedisClient, beforeRoomId: string) => {
   );
   await clearParticipants(client, beforeRoomId);
   await redis.room.CRUD.removeRoom(client, beforeRoomId);
+  await redis.room.stream.removeRoom(client, beforeRoomId);
   const roomId = await createRoom(client, title);
   return roomId;
 };

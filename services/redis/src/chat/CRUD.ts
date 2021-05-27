@@ -1,12 +1,16 @@
+import util from "util";
+
 import { RedisClient } from "redis";
 
 import { useChatKey } from "./keys";
+import { Chat } from "./types";
 
 export const appendChat = async (
   client: RedisClient,
   roomId: string,
-  message: string,
+  chat: Chat,
 ) => {
+  const message = JSON.stringify(chat);
   return new Promise<number>((resolve, reject) => {
     client.rpush(useChatKey(roomId), message, (error, reply) => {
       if (error) {
@@ -25,6 +29,23 @@ export const findAllChats = async (client: RedisClient, roomId: string) => {
         reject(error);
       } else {
         resolve(reply);
+      }
+    });
+  });
+};
+
+export const removeAllChats = async (client: RedisClient, roomId: string) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const chatKey = useChatKey(roomId);
+  return new Promise<void>((resolve, reject) => {
+    client.llen(chatKey, (error, reply) => {
+      if (error) {
+        reject(error);
+      } else {
+        const lpop = util.promisify(client.lpop).bind(client);
+        Promise.all(Array.from({ length: reply }, () => lpop(chatKey)))
+          .then(() => resolve())
+          .catch((error) => reject(error));
       }
     });
   });

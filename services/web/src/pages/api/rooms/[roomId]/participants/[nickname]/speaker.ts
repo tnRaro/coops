@@ -16,7 +16,6 @@
 
 import { HttpError } from "@coops/error";
 import { withRedisClient } from "@coops/redis";
-import * as redis from "@coops/redis";
 import * as logic from "@coops/logic";
 
 import { apiRouter } from "../../../../../../app/utils/apiRouter";
@@ -48,7 +47,7 @@ export default apiRouter({
         }
       }
       if (serverMode) {
-        redis.participant.CRUD.addParticipant(
+        await logic.participant.setParticipant(
           client,
           roomId,
           participant.participantId,
@@ -57,7 +56,7 @@ export default apiRouter({
           },
         );
       } else {
-        redis.participant.CRUD.addParticipant(
+        await logic.participant.setParticipant(
           client,
           roomId,
           participant.participantId,
@@ -92,7 +91,7 @@ export default apiRouter({
         }
       }
       if (serverMode) {
-        redis.participant.CRUD.addParticipant(
+        await logic.participant.setParticipant(
           client,
           roomId,
           participant.participantId,
@@ -101,7 +100,7 @@ export default apiRouter({
           },
         );
       } else {
-        redis.participant.CRUD.addParticipant(
+        await logic.participant.setParticipant(
           client,
           roomId,
           participant.participantId,

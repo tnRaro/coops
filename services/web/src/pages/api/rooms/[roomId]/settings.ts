@@ -30,11 +30,20 @@ import { apiRouter } from "../../../../app/utils/apiRouter";
 import { auth } from "../../../../app/utils/auth";
 import { isRoomIdQuery } from "../../../../app/utils/queries";
 
-const isRoomBody = (body: unknown): body is redis.room.types.Room => {
+const isRoomBody = (body: unknown): body is Partial<redis.room.types.Room> => {
   return (
-    typeof (body as redis.room.types.Room).title === "string" &&
-    typeof (body as redis.room.types.Room).description === "string" &&
-    typeof (body as redis.room.types.Room).maximumParticipants === "number"
+    ((body as redis.room.types.Room).title == null ||
+      typeof (body as redis.room.types.Room).title === "string") &&
+    ((body as redis.room.types.Room).description == null ||
+      typeof (body as redis.room.types.Room).description === "string") &&
+    ((body as redis.room.types.Room).maximumParticipants == null ||
+      typeof (body as redis.room.types.Room).maximumParticipants ===
+        "number") &&
+    !(
+      (body as redis.room.types.Room).title == null &&
+      (body as redis.room.types.Room).description == null &&
+      (body as redis.room.types.Room).maximumParticipants == null
+    )
   );
 };
 
@@ -45,18 +54,21 @@ export default apiRouter({
     }
     const { roomId } = req.query;
     const authorId = auth(req, `Access to the room: ${roomId}`);
-    return withRedisClient(async (client) => {
+    try {
       const body = JSON.parse(req.body);
       if (!isRoomBody(body)) {
         throw new HttpError(400);
       }
-      const { title, description, maximumParticipants } = body;
-      await logic.participant.validateHost(client, roomId, authorId);
-      await redis.room.CRUD.addRoom(client, roomId, {
-        title,
-        description,
-        maximumParticipants,
+      return withRedisClient(async (client) => {
+        await logic.participant.validateHost(client, roomId, authorId);
+        await redis.room.CRUD.addRoom(client, roomId, body);
+        await logic.room.updateRoom(client, roomId, body);
       });
-    });
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        throw new HttpError(400);
+      }
+      throw error;
+    }
   },
 });

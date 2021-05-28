@@ -6,32 +6,42 @@ import { pub } from "../pubsub";
 import { useParticipantIdKey } from "./keys";
 import { Participant } from "./types";
 
-type ParticipantWithParticipantId = Partial<Participant> & {
-  participantId: Participant["participantId"];
+type ParticipantWithNickname = Partial<Participant> & {
+  nickname: Participant["nickname"];
 };
+type SafeParticipantWithNickname = Omit<
+  ParticipantWithNickname,
+  "participantId"
+>;
 
 export const createParticipant = async (
   client: RedisClient,
   roomId: string,
-  participant: ParticipantWithParticipantId,
+  participant: SafeParticipantWithNickname,
 ) => {
-  const message = JSON.stringify({ type: "create", body: participant });
+  const message = JSON.stringify({
+    type: "create",
+    body: { ...participant, participantId: undefined },
+  });
   await pub(client, useParticipantIdKey(roomId), message);
 };
 export const updateParticipant = async (
   client: RedisClient,
   roomId: string,
-  participant: ParticipantWithParticipantId,
+  participant: SafeParticipantWithNickname,
 ) => {
-  const message = JSON.stringify({ type: "update", body: participant });
+  const message = JSON.stringify({
+    type: "update",
+    body: { ...participant, participantId: undefined },
+  });
   await pub(client, useParticipantIdKey(roomId), message);
 };
 export const deleteParticipant = async (
   client: RedisClient,
   roomId: string,
-  participantId: Participant["participantId"],
+  nickname: Participant["nickname"],
 ) => {
-  const message = JSON.stringify({ type: "delete", body: participantId });
+  const message = JSON.stringify({ type: "delete", body: nickname });
   await pub(client, useParticipantIdKey(roomId), message);
 };
 export const deleteAllParticipant = async (

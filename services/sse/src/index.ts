@@ -1,4 +1,5 @@
 /* eslint-disable require-atomic-updates */
+import util from "util";
 import { PassThrough } from "stream";
 
 import { HttpError, LogicError, UnauthorizedError } from "@coops/error";
@@ -35,7 +36,11 @@ koa.use(async (context, next) => {
       throw new HttpError(403);
     }
     const chatKey = redis.chat.useChatKey(roomId);
+    const roomKey = redis.room.keys.useRoomKey(roomId);
+    const participantIdKey = redis.participant.keys.useParticipantIdKey(roomId);
     await redis.pubsub.sub(client, chatKey);
+    await redis.pubsub.sub(client, roomKey);
+    await redis.pubsub.sub(client, participantIdKey);
     context.request.socket.setTimeout(0);
     context.req.socket.setNoDelay(true);
     context.req.socket.setKeepAlive(true);
@@ -61,24 +66,29 @@ koa.use(async (context, next) => {
           say(message, "chat");
           break;
         }
+        case roomKey: {
+          say(message, "room");
+          break;
+        }
+        case participantIdKey: {
+          say(message, "participant");
+          break;
+        }
         default: {
           // eslint-disable-next-line no-console
           console.error(channel, message);
         }
       }
     });
-    stream.on("close", () => {
+    stream.on("close", async () => {
       isRunning = false;
-      client.unsubscribe(chatKey, (error, reply) => {
-        if (error) {
-          // eslint-disable-next-line no-console
-          console.error(error);
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(reply);
-        }
-        quit();
-      });
+      const unsubscribe: (key: string) => Promise<string> = util
+        .promisify(client.unsubscribe)
+        .bind(client);
+      await Promise.all(
+        [chatKey, roomKey, participantIdKey].map((key) => unsubscribe(key)),
+      );
+      await quit();
     });
   } catch (error: unknown) {
     await quit();

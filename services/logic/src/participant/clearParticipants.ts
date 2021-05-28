@@ -22,4 +22,5 @@ export const clearParticipants = async (
   if (errors.length > 0) {
     throw errors;
   }
+  await redis.participant.stream.deleteAllParticipant(client, roomId);
 };

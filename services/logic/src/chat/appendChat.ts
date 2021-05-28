@@ -1,6 +1,5 @@
 import { RedisClient } from "redis";
 import * as redis from "@coops/redis";
-import { findParticipant } from "@coops/redis/dist/participant/CRUD";
 
 export const appendChat = async (
   client: RedisClient,
@@ -8,7 +7,7 @@ export const appendChat = async (
   message: string,
   authorId: string,
 ) => {
-  const [nickname] = await findParticipant(
+  const [nickname] = await redis.participant.CRUD.findParticipant(
     client,
     roomId,
     authorId,

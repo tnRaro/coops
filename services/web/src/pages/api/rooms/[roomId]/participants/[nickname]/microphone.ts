@@ -51,6 +51,7 @@ export default apiRouter({
           client,
           roomId,
           participant.participantId,
+          nickname,
           {
             mutedAudio: false,
           },
@@ -60,6 +61,7 @@ export default apiRouter({
           client,
           roomId,
           participant.participantId,
+          nickname,
           {
             muteAudio: false,
           },
@@ -95,6 +97,7 @@ export default apiRouter({
           client,
           roomId,
           participant.participantId,
+          nickname,
           {
             mutedAudio: true,
           },
@@ -104,6 +107,7 @@ export default apiRouter({
           client,
           roomId,
           participant.participantId,
+          nickname,
           {
             muteAudio: true,
           },

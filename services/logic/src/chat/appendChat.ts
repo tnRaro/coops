@@ -7,9 +7,16 @@ export const appendChat = async (
   message: string,
   authorId: string,
 ) => {
+  const [nickname] = await redis.participant.CRUD.findParticipant(
+    client,
+    roomId,
+    authorId,
+    "nickname",
+  );
+
   const chat = {
     message,
-    authorId,
+    nickname,
     createdAt: new Date(),
   } as redis.chat.types.Chat;
   await redis.chat.stream.appendChat(client, roomId, chat);

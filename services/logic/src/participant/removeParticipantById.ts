@@ -6,15 +6,17 @@ export const removeParticipantById = async (
   roomId: string,
   participantId: string,
 ) => {
+  const [nickname] = await redis.participant.CRUD.findParticipant(
+    client,
+    roomId,
+    participantId,
+    "nickname",
+  );
   await redis.participant.CRUD.removeParticipantId(
     client,
     roomId,
     participantId,
   );
   await redis.participant.CRUD.removeParticipant(client, roomId, participantId);
-  await redis.participant.stream.deleteParticipant(
-    client,
-    roomId,
-    participantId,
-  );
+  await redis.participant.stream.deleteParticipant(client, roomId, nickname);
 };

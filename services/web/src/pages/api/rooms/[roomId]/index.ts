@@ -117,7 +117,7 @@ export default apiRouter({
         title: string;
         description: string;
         maximumParticipants: number;
-        participants: redis.participant.types.Participant[];
+        participants: Partial<redis.participant.types.Participant>[];
         chats: string[];
       };
       if (hasAuth) {
@@ -125,7 +125,10 @@ export default apiRouter({
           client,
           roomId,
         );
-        result.participants = participants;
+        result.participants = participants.map((participant) => ({
+          ...participant,
+          participantId: undefined,
+        }));
         const chats = await logic.chat.findAllChats(client, roomId);
         result.chats = chats.map((chat) => JSON.stringify(chat));
       }

@@ -7,6 +7,7 @@ export const setParticipant = async (
   client: RedisClient,
   roomId: string,
   participantId: string,
+  nickname: string,
   participant: Partial<redis.participant.types.Participant>,
 ) => {
   if (!(await redis.room.CRUD.hasRoom(client, roomId))) {
@@ -23,7 +24,7 @@ export const setParticipant = async (
   );
   await redis.participant.stream.updateParticipant(client, roomId, {
     ...participant,
-    participantId,
+    nickname,
   });
   return participant;
 };

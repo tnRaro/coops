@@ -21,9 +21,7 @@ export const apiRouter = (handlers: ApiHandlers): NextApiHandler => {
     return handler(req, res)
       .then((data) => {
         if (data == null) {
-          if (res.statusCode === 200) {
-            res.statusCode = 204;
-          }
+          res.statusCode = 204;
         }
         if (data instanceof HttpResult) {
           res.status(data.code).send(data.body);

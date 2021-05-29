@@ -2,29 +2,16 @@
 import { Container, Heading } from "@chakra-ui/react";
 import { useEffect, VoidFunctionComponent } from "react";
 
+import { useStream } from "../app/hooks/useStream";
+
 type PageProps = unknown;
 const Page: VoidFunctionComponent<PageProps> = (props) => {
+  const stream = useStream("6XKFUS", "5158b897-5be4-43f4-83dd-684c2d5340d5");
   useEffect(() => {
-    const eventSource = new EventSource(
-      "http://localhost:5353/api/rooms/535353/stream?key=53",
-      {
-        withCredentials: true,
-      },
-    );
-    eventSource.onmessage = (event) => {
-      console.log(event.type, event.data);
-    };
-    eventSource.addEventListener("li dailin", (event) => {
-      console.log("li dailin", event);
-    });
-    eventSource.addEventListener("chat", (event) => {
-      console.log("chat", event);
-    });
-    eventSource.onerror = (error) => {
-      console.error(error);
-      eventSource.close();
-    };
-  }, []);
+    stream.on("chat", (data) => console.log(data));
+    stream.on("room", (data) => console.log(data));
+    stream.on("participant", (data) => console.log(data));
+  }, [stream]);
   return (
     <Container>
       <Heading>Work in Progress</Heading>

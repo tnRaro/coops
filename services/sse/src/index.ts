@@ -20,7 +20,7 @@ koa.use(
 );
 
 koa.use(async (context, next) => {
-  const pathReg = /^\/api\/rooms\/([^/]{6})\/stream$/;
+  const pathReg = /^\/sse\/rooms\/([^/]{6})\/stream$/;
   if (!pathReg.test(context.path)) {
     return next();
   }
@@ -46,6 +46,7 @@ koa.use(async (context, next) => {
     context.req.socket.setKeepAlive(true);
     context.set("Content-Type", "text/event-stream");
     context.set("Cache-Control", "no-cache");
+    context.set("X-Accel-Buffering", "no");
     context.set("Connection", "keep-alive");
     const stream = new PassThrough();
     context.status = 200;

@@ -1,5 +1,5 @@
 import redis from "@coops/redis";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ChatMessage {
   message: string;
@@ -23,6 +23,7 @@ type ParticipantMessage =
   | { type: "delete_all" };
 
 export const useStream = (roomId: string | null, authorId: string | null) => {
+  const [tries, setTries] = useState(0);
   type ChatMessageHandler = (message: ChatMessage) => void;
   type RoomMessageHandler = (message: RoomMessage) => void;
   type ParticipantMessageHandler = (message: ParticipantMessage) => void;
@@ -59,7 +60,7 @@ export const useStream = (roomId: string | null, authorId: string | null) => {
     if (!roomId || !authorId) {
       return;
     }
-    const url = `${location.protocol}//${location.hostname}:5353/api/rooms/${roomId}/stream?key=${authorId}`;
+    const url = `/sse/rooms/${roomId}/stream?key=${authorId}`;
     const eventSource = new EventSource(url, { withCredentials: true });
     const chatHandler = (event: Event) => {
       if (chatMessageHandlerRef.current == null) {
@@ -92,6 +93,7 @@ export const useStream = (roomId: string | null, authorId: string | null) => {
       // eslint-disable-next-line no-console
       console.error(error);
       eventSource.close();
+      setTries((tries) => tries + 1);
     };
     eventSource.addEventListener("chat", chatHandler);
     eventSource.addEventListener("room", roomHandler);
@@ -103,7 +105,7 @@ export const useStream = (roomId: string | null, authorId: string | null) => {
       eventSource.removeEventListener("participant", participantHandler);
       eventSource.removeEventListener("error", errorHandler);
     };
-  }, [authorId, roomId]);
+  }, [authorId, roomId, tries]);
 
   return result.current;
 };

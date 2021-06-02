@@ -1,6 +1,12 @@
 version: "3.8"
 
 services:
+  nginx:
+    image: nginx:1.21.0-alpine
+    volumes:
+      - ../../templates:/etc/nginx/templates
+    ports:
+      - 3000:80
   web:
     command: yarn web dev
     build:
@@ -11,8 +17,6 @@ services:
         ENV: development
     working_dir: /app
     env_file: "../../services/web/.env.local"
-    ports:
-      - 3000:3000
     volumes:
       - ../../services/web/src:/app/services/web/src
       - ../../services/web/public:/app/services/web/public
@@ -25,13 +29,9 @@ services:
       args:
         ENV: development
     working_dir: /app
-    ports:
-      - 5353:5353
   peer:
     image: peerjs/peerjs-server
-    command: --port 9000 --path /
-    ports:
-      - 9000:9000
+    command: --port 9000 --path /peer
   redis:
     image: redis:6.2.3-alpine
   redis-commender:

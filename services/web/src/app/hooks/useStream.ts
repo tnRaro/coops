@@ -1,9 +1,9 @@
 import redis from "@coops/redis";
 import { useCallback, useEffect, useRef } from "react";
 
-interface ChatMessage {
+export interface ChatMessage {
   message: string;
-  authorId: string;
+  nickname: string;
   createdAt: Date;
 }
 
@@ -12,11 +12,11 @@ type RoomMessage =
   | { type: "delete" };
 
 type Nickname = redis.participant.types.Participant["nickname"];
-type ParticipantWithNickname = Partial<redis.participant.types.Participant> & {
+export type ParticipantWithNickname = Partial<redis.participant.types.Participant> & {
   nickname: Nickname;
 };
 
-type ParticipantMessage =
+export type ParticipantMessage =
   | { type: "create"; body: ParticipantWithNickname }
   | { type: "update"; body: ParticipantWithNickname }
   | { type: "delete"; body: Nickname }

@@ -1,9 +1,30 @@
 import { Box, Container, Heading, Text } from "@chakra-ui/layout";
-import { Input, Button, Flex, Spacer, Center } from "@chakra-ui/react";
-import { VoidFunctionComponent } from "react";
+import {
+  Input,
+  Button,
+  Flex,
+  Spacer,
+  Center,
+  useToast,
+  UseToastOptions,
+  toast,
+} from "@chakra-ui/react";
+import { useState, VoidFunctionComponent } from "react";
+import { useRouter } from "next/router";
+import { consts } from "@coops/core";
+
+const errorToastOptions: UseToastOptions = {
+  duration: 9000,
+  isClosable: true,
+  status: "error",
+};
 
 type PageProps = unknown;
 const Page: VoidFunctionComponent<PageProps> = (props) => {
+  const [title, setTitle] = useState("");
+  const [roomId, setRoomId] = useState("");
+  const router = useRouter();
+  const toast = useToast();
   return (
     <Flex height="100%" justifyContent="center" alignItems="center">
       <Flex flexDirection="column" padding="14" layerStyle="card">
@@ -21,6 +42,8 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
           padding="4"
           paddingLeft="5"
           marginBottom="2.5"
+          value={roomId}
+          onChange={(event) => setRoomId(event.target.value)}
         />
         <Button
           backgroundColor="text.10"
@@ -31,6 +54,10 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
           textStyle="label1Bold"
           marginBottom="5"
           _hover={{ backgroundColor: "text.33" }}
+          onClick={() => {
+            router.push(`/rooms/${roomId}`, undefined, { shallow: true });
+          }}
+          isDisabled={roomId.length < 6}
         >
           방 참가하기
         </Button>
@@ -57,6 +84,8 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
           paddingLeft="5"
           marginTop="5"
           marginBottom="2.5"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
         />
         <Button
           backgroundColor="primary.10"
@@ -66,6 +95,28 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
           color="primary.100"
           textStyle="label1Bold"
           _hover={{ backgroundColor: "text.33" }}
+          onClick={() => {
+            if (title.length > consts.room.title.length.max) {
+              toast({
+                ...errorToastOptions,
+                description: "방 제목은 최대 10자 입니다",
+              });
+            } else if (title.length < consts.room.title.length.min) {
+              toast({
+                ...errorToastOptions,
+                description: "방 제목은 최소 2자 이상입니다",
+              });
+            } else {
+              return fetch(`/api/room/title/${title}`, { method: "POST" })
+                .then(function (response) {
+                  return response.json();
+                })
+                .then(function (myJson) {
+                  const { roomId } = myJson;
+                  router.push(`/rooms/${roomId}`, undefined, { shallow: true });
+                });
+            }
+          }}
         >
           방 만들기
         </Button>

@@ -47,6 +47,11 @@ export const enterParticipant = async (
     participantId,
     participant,
   );
+  await redis.participant.CRUD.setExpireToParticipant(
+    client,
+    roomId,
+    participantId,
+  );
   await redis.participant.stream.createParticipant(client, roomId, participant);
   return participant;
 };

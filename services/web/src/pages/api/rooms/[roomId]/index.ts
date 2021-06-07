@@ -147,4 +147,18 @@ export default apiRouter({
       return new HttpResult({ roomId }, 201);
     });
   },
+  DELETE: async (req, res) => {
+    if (!isRoomIdQuery(req.query)) {
+      throw new HttpError(400);
+    }
+    const roomId = req.query.roomId;
+    const authorId = auth(req, `Access to the room: ${roomId}`);
+    return withRedisClient(async (client) => {
+      await logic.participant.validateHost(client, roomId, authorId);
+      await logic.participant.clearParticipants(client, roomId);
+      await redis.chat.CURD.removeAllChats(client, roomId);
+      await redis.room.stream.removeRoom(client, roomId);
+      return new HttpResult({ roomId }, 201);
+    });
+  },
 });

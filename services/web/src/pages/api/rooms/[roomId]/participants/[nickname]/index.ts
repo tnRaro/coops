@@ -58,30 +58,25 @@ export default apiRouter({
     if (!isParticipantQuery(req.query)) {
       throw new HttpError(400);
     }
-    const { roomId } = req.query;
+    const { roomId, nickname } = req.query;
     const authorId = auth(req, `Access to the room: ${roomId}`);
     return withRedisClient(async (client) => {
-      await logic.participant.validateHost(client, roomId, authorId);
-      const participantIds = await redis.participant.CRUD.findAllParticipantIds(
+      const participant = await logic.participant.findParticipantByNickname(
         client,
         roomId,
+        nickname,
       );
-      for (const participantId of participantIds) {
-        const [nickname] = await redis.participant.CRUD.findParticipant(
-          client,
-          roomId,
-          participantId,
-          "nickname",
-        );
-        if (nickname === req.query.nickname) {
-          await logic.participant.removeParticipantById(
-            client,
-            roomId,
-            participantId,
-          );
-          break;
-        }
+      if (participant == null) {
+        throw new HttpError(404);
       }
+      if (participant.participantId !== authorId) {
+        await logic.participant.validateHost(client, roomId, authorId);
+      }
+      await logic.participant.removeParticipantById(
+        client,
+        roomId,
+        participant.participantId,
+      );
     });
   },
 });

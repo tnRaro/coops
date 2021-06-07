@@ -6,3 +6,4 @@ export { hasParticipantId } from "./hasParticipantId";
 export { numOfParticipantIds } from "./numOfParticipantIds";
 export { removeParticipant } from "./removeParticipant";
 export { removeParticipantId } from "./removeParticipantId";
+export { setExpireToParticipant } from "./setExpireToParticipant";

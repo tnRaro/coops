@@ -22,6 +22,16 @@ const theme = extendTheme({
       backgroundColor: "rgba(39, 43, 47, 0.66)",
       boxShadow: "popOut",
     },
+    elevation1: {
+      background: "elevation.1",
+      boxShadow: "overlay",
+      borderRadius: "card",
+    },
+    elevation2: {
+      background: "elevation.2",
+      boxShadow: "overlay",
+      borderRadius: "card"
+    }
   },
   textStyles: {
     heading1: {

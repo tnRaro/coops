@@ -1,7 +1,11 @@
 import redis from "@coops/redis";
+import { useAtomValue } from "jotai/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { authorIdAtom, roomIdAtom } from "../atoms";
+
 export interface ChatMessage {
+  id: string;
   message: string;
   nickname: string;
   createdAt: Date;
@@ -22,7 +26,9 @@ export type ParticipantMessage =
   | { type: "delete"; body: Nickname }
   | { type: "delete_all" };
 
-export const useStream = (roomId: string | null, authorId: string | null) => {
+export const useStream = () => {
+  const roomId = useAtomValue(roomIdAtom);
+  const authorId = useAtomValue(authorIdAtom);
   const [tries, setTries] = useState(0);
   type ChatMessageHandler = (message: ChatMessage) => void;
   type RoomMessageHandler = (message: RoomMessage) => void;

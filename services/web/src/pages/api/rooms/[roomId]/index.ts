@@ -87,21 +87,14 @@ export default apiRouter({
       let hasAuth = false;
       if (req.headers.authorization != null) {
         const authorId = auth(req, `Access to the room: ${roomId}`);
-        try {
-          const isParticipant = await logic.participant.isParticipant(
-            client,
-            roomId,
-            authorId,
-          );
-          hasAuth = isParticipant;
-        } catch (error) {
-          if (error instanceof HttpError) {
-            if (error.code !== 404) {
-              throw error;
-            }
-          } else {
-            throw error;
-          }
+        const isParticipant = await logic.participant.isParticipant(
+          client,
+          roomId,
+          authorId,
+        );
+        hasAuth = isParticipant;
+        if (!hasAuth) {
+          throw new HttpError(404);
         }
       }
       const result = {

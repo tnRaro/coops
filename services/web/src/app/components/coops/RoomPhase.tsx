@@ -27,7 +27,11 @@ export const RoomRhase: React.VFC<RoomRhaseProps> = () => {
           </SmallCard>
         </Scroll>
       </Flex>
-      <Flex direction="vertical" gap="10" css={{ flex: "1 1 480px" }}>
+      <Flex
+        direction="vertical"
+        gap="10"
+        css={{ flex: "1 1 480px", minWidth: 0 }}
+      >
         <SmallCard css={{ background: "$cardGradient" }}>
           <RoomDetailCard />
         </SmallCard>

@@ -3,7 +3,7 @@ export const consts = {
     title: {
       length: {
         min: 2,
-        max: 10,
+        max: 53,
       },
     },
   },
@@ -11,7 +11,7 @@ export const consts = {
     nickname: {
       length: {
         min: 2,
-        max: 12,
+        max: 20,
       },
     },
   },

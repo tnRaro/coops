@@ -66,8 +66,9 @@ export const ChatSender: React.VFC<ChatSenderProps> = () => {
         placeholder="메시지 보내기"
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        onKeyDown={async (event) => {
+        onKeyPress={async (event) => {
           if (event.key === "Enter") {
+            setValue("");
             await send(value);
           }
         }}
@@ -75,6 +76,7 @@ export const ChatSender: React.VFC<ChatSenderProps> = () => {
       <Button
         color="gray"
         onClick={async () => {
+          setValue("");
           await send(value);
         }}
       >

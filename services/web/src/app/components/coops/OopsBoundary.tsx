@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { errorAtom } from "../../atoms";
 import { FrontError } from "../../errors";
@@ -19,6 +19,11 @@ export const OopsBoundary: React.VFC<OopsBoundaryProps> = (props) => {
   const [error] = useAtom(errorAtom);
   const resetError = useResetAtom(errorAtom);
   const resetRoom = useResetRoom();
+
+  useEffect(() => {
+    resetError();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   if (error == null) {
     return props.children;

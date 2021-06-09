@@ -1,12 +1,14 @@
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FiSend } from "react-icons/fi";
+import { RiUserFill, RiVipCrownFill } from "react-icons/ri";
 
 import {
   authorIdAtom,
   chatsAtom,
   nicknameAtom,
+  participantsAtom,
   roomIdAtom,
 } from "../../../atoms";
 import { useQuery } from "../../../hooks/useQuery";
@@ -21,6 +23,14 @@ export const ChatList: React.VFC<ChatListProps> = () => {
   const chats = useAtomValue(chatsAtom);
   const myNickname = useAtomValue(nicknameAtom);
   const latestChatRef = useRef<HTMLDivElement | null>(null);
+  const participants = useAtomValue(participantsAtom);
+  const participantMap = useMemo(
+    () =>
+      new Map(
+        participants.map((participant) => [participant.nickname, participant]),
+      ),
+    [participants],
+  );
   useEffect(() => {
     latestChatRef.current?.scrollIntoView({
       block: "end",
@@ -28,13 +38,30 @@ export const ChatList: React.VFC<ChatListProps> = () => {
   }, [chats.length]);
   return (
     <Scroll direction="vertical" gap="10" y>
-      {chats.map((chat) => {
+      {chats.slice(-100).map((chat) => {
         const isMe = chat.nickname === myNickname;
+        const isHost = participantMap.get(chat.nickname)?.isHost;
         return (
-          <Flex ref={latestChatRef} key={chat.id} gap="16">
-            <Text color={isMe ? "primary100" : "text100"}>{chat.nickname}</Text>
-            <Text color={isMe ? "primary66" : "text66"}>{chat.message}</Text>
-          </Flex>
+          // eslint-disable-next-line @shopify/jsx-no-hardcoded-content
+          <Text ref={latestChatRef} key={chat.id}>
+            {isHost ? <RiVipCrownFill /> : <RiUserFill />}
+            <Text as="span" color={isMe ? "primary100" : "text100"}>
+              {chat.nickname}
+            </Text>
+            {": "}
+            <Text
+              as="span"
+              color="text66"
+              css={{
+                wordBreak: "break-all",
+                "&:hover": {
+                  color: "$text100",
+                },
+              }}
+            >
+              {chat.message}
+            </Text>
+          </Text>
         );
       })}
     </Scroll>

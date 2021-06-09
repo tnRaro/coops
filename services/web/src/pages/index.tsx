@@ -26,10 +26,7 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
   const setOops = useOops();
   const queries = useQuery();
   const resetRoom = useResetRoom();
-  const linkReg = useMemo(
-    () => new RegExp(`^${location.origin}/rooms/(.{6})$`),
-    [],
-  );
+  const linkReg = new RegExp(`^${globalThis?.location?.origin}/rooms/(.{6})$`);
   useEffect(() => {
     resetRoom();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -55,7 +55,7 @@ export const { styled, css, keyframes, getCssString, theme } = createCss({
       paragraph1: "$16",
     },
     fonts: {
-      sans: "Noto Sans KR, sans-serif",
+      sans: "Spoqa Han Sans Neo, Noto Sans KR, sans-serif",
     },
     fontWeights: {
       bold: 700,

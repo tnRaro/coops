@@ -7,6 +7,10 @@ import {
   authorIdAtom,
   chatsAtom,
   isHostAtom,
+  muteAudioAtom,
+  mutedAudioAtom,
+  mutedSpeakerAtom,
+  muteSpeakerAtom,
   nicknameAtom,
   participantsAtom,
   peerIdAtom,
@@ -97,6 +101,13 @@ const useRealtimeApi = () => {
   const setMaximumParticipants = useUpdateAtom(roomMaximumParticipantsAtom);
   const setParticipants = useUpdateAtom(participantsAtom);
   const setChats = useUpdateAtom(chatsAtom);
+  const nickname = useAtomValue(nicknameAtom);
+  const setPeerId = useUpdateAtom(peerIdAtom);
+  const setIsHost = useUpdateAtom(isHostAtom);
+  const setMuteAudio = useUpdateAtom(muteAudioAtom);
+  const setMuteSpeaker = useUpdateAtom(muteSpeakerAtom);
+  const setMutedAudio = useUpdateAtom(mutedAudioAtom);
+  const setMutedSpeaker = useUpdateAtom(mutedSpeakerAtom);
   const resetParticipants = useResetAtom(participantsAtom);
   const resetRoom = useResetRoom();
   const resetAuthorId = useResetAtom(authorIdAtom);
@@ -170,6 +181,26 @@ const useRealtimeApi = () => {
               }
             }),
           );
+          if (participant.nickname === nickname) {
+            if (participant.peerId != null) {
+              setPeerId(participant.peerId);
+            }
+            if (participant.isHost != null) {
+              setIsHost(participant.isHost);
+            }
+            if (participant.muteAudio != null) {
+              setMuteAudio(participant.muteAudio);
+            }
+            if (participant.muteSpeaker != null) {
+              setMuteSpeaker(participant.muteSpeaker);
+            }
+            if (participant.mutedAudio != null) {
+              setMutedAudio(participant.mutedAudio);
+            }
+            if (participant.mutedSpeaker != null) {
+              setMutedSpeaker(participant.mutedSpeaker);
+            }
+          }
           break;
         }
         case "delete": {
@@ -188,8 +219,27 @@ const useRealtimeApi = () => {
         }
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [
+    nickname,
+    resetAuthorId,
+    resetIsHost,
+    resetNickname,
+    resetParticipants,
+    resetPeerId,
+    resetRoom,
+    setChats,
+    setDescription,
+    setIsHost,
+    setMaximumParticipants,
+    setMuteAudio,
+    setMuteSpeaker,
+    setMutedAudio,
+    setMutedSpeaker,
+    setParticipants,
+    setPeerId,
+    setTitle,
+    stream,
+  ]);
 };
 
 type PageProps = unknown;

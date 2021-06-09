@@ -1,7 +1,6 @@
-/* eslint-disable @shopify/jsx-no-complex-expressions */
 import { useAtomValue } from "jotai/utils";
 import React, { useRef } from "react";
-import { FiShare2, FiCheck, FiCopy } from "react-icons/fi";
+import { FiCheck, FiCopy, FiShare2 } from "react-icons/fi";
 
 import { roomIdAtom } from "../../../atoms";
 import { useClipboard } from "../../../hooks/useClipboard";
@@ -34,7 +33,10 @@ export const InviteCodeCard: React.VFC<InviteCodeCardProps> = () => {
             inputRef.current?.select();
           }}
         />
-        <Button onClick={() => copy(roomId)} disabled={copied}>
+        <Button
+          onClick={() => copy(location.origin + location.pathname)}
+          disabled={copied}
+        >
           <Flex align="center" gap="10">
             {copied ? (
               <>

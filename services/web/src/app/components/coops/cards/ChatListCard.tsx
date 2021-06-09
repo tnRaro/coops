@@ -3,16 +3,23 @@ import { useAtomValue } from "jotai/utils";
 import React, { useEffect, useRef, useState } from "react";
 import { FiSend } from "react-icons/fi";
 
-import { authorIdAtom, chatsAtom, roomIdAtom } from "../../../atoms";
+import {
+  authorIdAtom,
+  chatsAtom,
+  nicknameAtom,
+  roomIdAtom,
+} from "../../../atoms";
 import { useQuery } from "../../../hooks/useQuery";
 import { Button } from "../../primitives/Button";
 import { Flex } from "../../primitives/Flex";
 import { Input } from "../../primitives/Input";
+import { Scroll } from "../../primitives/Scroll";
 import { Text } from "../../primitives/Text";
 
 interface ChatListProps {}
 export const ChatList: React.VFC<ChatListProps> = () => {
   const chats = useAtomValue(chatsAtom);
+  const myNickname = useAtomValue(nicknameAtom);
   const latestChatRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     latestChatRef.current?.scrollIntoView({
@@ -20,34 +27,17 @@ export const ChatList: React.VFC<ChatListProps> = () => {
     });
   }, [chats.length]);
   return (
-    <Flex
-      direction="vertical"
-      gap="10"
-      css={{
-        flex: "1 1 0",
-        overflowY: "auto",
-        $$scrollbarColor: "hsl(0deg 0% 0% / 20%)",
-        $$scrollbarThumb: "$colors$text33",
-        scrollbarWidth: "thin",
-        scrollbarColor: "$$scrollbarThumb $$scrollbarColor",
-        "&::-webkit-scrollbar": {
-          background: "$$scrollbarColor",
-          width: "8px",
-          borderRadius: "$full",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "$$scrollbarThumb",
-          borderRadius: "$full",
-        },
-      }}
-    >
-      {chats.map((chat) => (
-        <Flex ref={latestChatRef} key={chat.id} gap="16">
-          <Text>{chat.nickname}</Text>
-          <Text color="text66">{chat.message}</Text>
-        </Flex>
-      ))}
-    </Flex>
+    <Scroll direction="vertical" gap="10" y>
+      {chats.map((chat) => {
+        const isMe = chat.nickname === myNickname;
+        return (
+          <Flex ref={latestChatRef} key={chat.id} gap="16">
+            <Text color={isMe ? "primary100" : "text100"}>{chat.nickname}</Text>
+            <Text color={isMe ? "primary66" : "text66"}>{chat.message}</Text>
+          </Flex>
+        );
+      })}
+    </Scroll>
   );
 };
 interface ChatSenderProps {}

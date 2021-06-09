@@ -4,6 +4,10 @@ import {
   authorIdAtom,
   chatsAtom,
   isHostAtom,
+  muteAudioAtom,
+  mutedAudioAtom,
+  mutedSpeakerAtom,
+  muteSpeakerAtom,
   nicknameAtom,
   participantsAtom,
   peerIdAtom,
@@ -23,9 +27,13 @@ export const useResetRoom = () => {
   const resetParticipants = useResetAtom(participantsAtom);
   const resetChats = useResetAtom(chatsAtom);
   const resetAuthorId = useResetAtom(authorIdAtom);
-  const resetNicknameAtom = useResetAtom(nicknameAtom);
-  const resetPeerIdAtom = useResetAtom(peerIdAtom);
-  const resetIsHostAtom = useResetAtom(isHostAtom);
+  const resetNickname = useResetAtom(nicknameAtom);
+  const resetPeerId = useResetAtom(peerIdAtom);
+  const resetIsHost = useResetAtom(isHostAtom);
+  const resetMuteAudio = useResetAtom(muteAudioAtom);
+  const resetMuteSpeaker = useResetAtom(muteSpeakerAtom);
+  const resetMutedAudio = useResetAtom(mutedAudioAtom);
+  const resetMutedSpeaker = useResetAtom(mutedSpeakerAtom);
 
   const reset = () => {
     resetRoomId();
@@ -35,9 +43,13 @@ export const useResetRoom = () => {
     resetParticipants();
     resetChats();
     resetAuthorId();
-    resetNicknameAtom();
-    resetPeerIdAtom();
-    resetIsHostAtom();
+    resetNickname();
+    resetPeerId();
+    resetIsHost();
+    resetMuteAudio();
+    resetMuteSpeaker();
+    resetMutedAudio();
+    resetMutedSpeaker();
   };
 
   return reset;

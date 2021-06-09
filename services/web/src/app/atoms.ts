@@ -14,6 +14,10 @@ export const authorIdAtom = atomWithReset<string | null>(null);
 export const nicknameAtom = atomWithReset<string | null>(null);
 export const peerIdAtom = atomWithReset<string | null>(null);
 export const isHostAtom = atomWithReset<boolean>(false);
+export const muteAudioAtom = atomWithReset<boolean>(false);
+export const muteSpeakerAtom = atomWithReset<boolean>(false);
+export const mutedAudioAtom = atomWithReset<boolean>(false);
+export const mutedSpeakerAtom = atomWithReset<boolean>(false);
 
 export const roomIdAtom = atomWithReset<string | null>(null);
 export const roomTitleAtom = atomWithReset<string | null>(null);

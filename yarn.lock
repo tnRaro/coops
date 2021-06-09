@@ -1589,6 +1589,17 @@
     "@radix-ui/primitive" "0.0.5"
     "@radix-ui/react-compose-refs" "0.0.5"
 
+"@radix-ui/react-toggle@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-toggle/-/react-toggle-0.0.8.tgz#d22c96bad90d24137364464839a82a9193752d30"
+  integrity sha512-b4Ew8y9xYTNjs5h81YPCcKZak54n1q0/hqd6vNnIdbCnWzJ0XHaFMkAp39yoEf15MG7ScqnG7DJbyNeDl9AbDg==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/primitive" "0.0.5"
+    "@radix-ui/react-polymorphic" "0.0.11"
+    "@radix-ui/react-primitive" "0.0.13"
+    "@radix-ui/react-use-controllable-state" "0.0.6"
+
 "@radix-ui/react-use-body-pointer-events@0.0.6":
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-use-body-pointer-events/-/react-use-body-pointer-events-0.0.6.tgz#30b21301880417e7dbb345871ff5a83f2abe0d8d"

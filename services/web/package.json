@@ -11,6 +11,7 @@
     "@emotion/is-prop-valid": "^1.1.0",
     "@radix-ui/react-alert-dialog": "^0.0.17",
     "@radix-ui/react-portal": "^0.0.13",
+    "@radix-ui/react-toggle": "^0.0.8",
     "@stitches/react": "^0.1.9",
     "@types/uuid": "^8.3.0",
     "jotai": "^0.16.7",

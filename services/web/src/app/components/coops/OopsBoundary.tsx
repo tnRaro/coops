@@ -23,7 +23,7 @@ export const OopsBoundary: React.VFC<OopsBoundaryProps> = (props) => {
   useEffect(() => {
     resetError();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+  }, [globalThis?.location?.pathname]);
 
   if (error == null) {
     return props.children;

@@ -17,53 +17,51 @@ export const ToastBoundary: React.VFC<OopsBoundaryProps> = (props) => {
   return (
     <>
       {props.children}
-      <Portal>
-        <Flex
-          direction="vertical"
-          reverse
-          gap="10"
-          css={{
-            position: "fixed",
-            width: "100%",
-            height: "100%",
-            pointerEvents: "none",
-          }}
-          align="center"
-        >
-          {toasts.map((toast) => {
-            return (
-              <Flex
-                align="center"
-                key={toast.id}
+      <Flex
+        direction="vertical"
+        reverse
+        gap="10"
+        css={{
+          position: "fixed",
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+        }}
+        align="center"
+      >
+        {toasts.map((toast) => {
+          return (
+            <Flex
+              align="center"
+              key={toast.id}
+              css={{
+                minWidth: "320px",
+                padding: "$16",
+                zIndex: "$popOut",
+                boxShadow: "$popOut",
+                background: "$dangerous100",
+                borderRadius: "$medium",
+              }}
+            >
+              <Text>{toast.message}</Text>
+              <Spacer />
+              <Button
                 css={{
-                  minWidth: "320px",
-                  padding: "$16",
-                  zIndex: "$popOut",
-                  boxShadow: "$popOut",
-                  background: "$dangerous100",
-                  borderRadius: "$medium",
+                  padding: "$10",
+                }}
+                color="transparent"
+                onClick={() => {
+                  setToasts((toasts) =>
+                    toasts.filter((to) => to.id !== toast.id),
+                  );
                 }}
               >
-                <Text>{toast.message}</Text>
-                <Spacer />
-                <Button
-                  css={{
-                    padding: "$10",
-                  }}
-                  color="transparent"
-                  onClick={() => {
-                    setToasts((toasts) =>
-                      toasts.filter((to) => to.id !== toast.id),
-                    );
-                  }}
-                >
-                  닫기
-                </Button>
-              </Flex>
-            );
-          })}
-        </Flex>
-      </Portal>
+                닫기
+              </Button>
+            </Flex>
+          );
+        })}
+      </Flex>
     </>
   );
 };

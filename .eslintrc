@@ -11,6 +11,7 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "import/no-extraneous-dependencies": "off",
-    "no-process-env": "off"
+    "no-process-env": "off",
+    "@shopify/jsx-no-complex-expressions": "off"
   }
 }

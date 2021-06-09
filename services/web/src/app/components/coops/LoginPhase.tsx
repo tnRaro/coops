@@ -32,6 +32,32 @@ export const LoginPhase: React.VFC<LoginPhaseProps> = () => {
   const setOops = useOops();
   const queries = useQuery();
   if (roomId == null) return null;
+  const setNicknameHandler = async () => {
+    if (nickname.length > consts.participant.nickname.length.max) {
+      setOops(
+        new FrontError(
+          `참여자 이름은 최대 ${consts.participant.nickname.length.max}자입니다`,
+        ),
+      );
+    } else if (nickname.length < consts.participant.nickname.length.min) {
+      setOops(
+        new FrontError(
+          `참여자 이름은 최소 ${consts.participant.nickname.length.min}자 이상이어야 합니다`,
+        ),
+      );
+    } else {
+      try {
+        const participant = await queries.createParticipant(roomId, nickname);
+        setAuthorId(participant.participantId);
+        setGlobalNickname(participant.nickname);
+        setPeerId(participant.peerId);
+        setIsHost(participant.isHost);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    }
+  };
   return (
     <Container>
       <Card title={title}>
@@ -40,36 +66,13 @@ export const LoginPhase: React.VFC<LoginPhaseProps> = () => {
             placeholder="사용할 이름을 입력해주세요"
             value={nickname}
             onChange={(event) => setNickname(event.target.value)}
-          />
-          <Button
-            onClick={async () => {
-              if (nickname.length > consts.participant.nickname.length.max) {
-                setOops(new FrontError("사용자 이름은 최대 12자 입니다"));
-              } else if (
-                nickname.length < consts.participant.nickname.length.min
-              ) {
-                setOops(
-                  new FrontError("사용자 이름은 최소 2자 이상이어야 합니다"),
-                );
-              } else {
-                try {
-                  const participant = await queries.createParticipant(
-                    roomId,
-                    nickname,
-                  );
-                  setAuthorId(participant.participantId);
-                  setGlobalNickname(participant.nickname);
-                  setPeerId(participant.peerId);
-                  setIsHost(participant.isHost);
-                } catch (error) {
-                  // eslint-disable-next-line no-console
-                  console.error(error);
-                }
+            onKeyPress={(event) => {
+              if (event.key === "Enter") {
+                setNicknameHandler();
               }
             }}
-          >
-            확인
-          </Button>
+          />
+          <Button onClick={setNicknameHandler}>확인</Button>
         </Flex>
       </Card>
     </Container>

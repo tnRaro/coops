@@ -51,8 +51,11 @@ export const removeAllChats = async (client: RedisClient, roomId: string) => {
   });
 };
 
-export const setExpireToChat = (client: RedisClient, roomId: string) => {
-  const expire = 86400;
+export const setExpireToChat = (
+  client: RedisClient,
+  roomId: string,
+  expire = 86400,
+) => {
   return new Promise<void>((resolve, reject) => {
     client.expire(useChatKey(roomId), expire, (error, reply) => {
       if (error) {

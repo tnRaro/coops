@@ -6,8 +6,8 @@ export const setExpireToParticipant = (
   client: RedisClient,
   roomId: string,
   participantId: string,
+  expire = 86400,
 ) => {
-  const expire = 86400;
   return Promise.all([
     new Promise<void>((resolve, reject) => {
       client.expire(

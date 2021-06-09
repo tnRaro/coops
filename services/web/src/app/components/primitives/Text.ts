@@ -36,7 +36,7 @@ const whiteSpace = properties.whiteSpace.reduce((variants, value) => {
 export const Text = styled("p", {
   appearance: "none",
   boxSizing: "border-box",
-  color: "$text100",
+  color: "inherit",
   fontFamily: "$sans",
   fontWeight: "$paragraph",
   lineHeight: "$paragraph",

@@ -2,10 +2,13 @@ import { styled } from "../../stitches.config";
 
 export const Button = styled("button", {
   appearance: "none",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
   boxSizing: "border-box",
   padding: "$input",
   background: "transparent",
-  color: "initial",
+  color: "inherit",
   fontFamily: "$sans",
   fontWeight: "$boldLabel",
   lineHeight: "$label",
@@ -31,6 +34,12 @@ export const Button = styled("button", {
     background: "$text8",
     color: "$text33",
   },
+  "&[data-state=on]": {
+    color: "inherit",
+  },
+  "&[data-state=off]": {
+    color: "$text33",
+  },
   variants: {
     color: {
       primary: {
@@ -52,9 +61,11 @@ export const Button = styled("button", {
         $$activeBackgroundColor: "$colors$dangerous8",
       },
       transparent: {
-        color: "$text100",
         $$hoverBackgroundColor: "$colors$text33",
         $$activeBackgroundColor: "$colors$text8",
+        "&:disabled": {
+          background: "transparent",
+        },
       },
     },
     size: {

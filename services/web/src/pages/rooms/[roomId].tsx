@@ -13,6 +13,7 @@ import {
   muteSpeakerAtom,
   nicknameAtom,
   participantsAtom,
+  participantUpdaterAtom,
   peerIdAtom,
   roomDescriptionAtom,
   roomIdAtom,
@@ -23,9 +24,11 @@ import { LoginPhase } from "../../app/components/coops/LoginPhase";
 import { RoomRhase } from "../../app/components/coops/RoomPhase";
 import { useQuery } from "../../app/hooks/useQuery";
 import { useResetRoom } from "../../app/hooks/useResetRoom";
-import { useStream } from "../../app/hooks/useStream";
+import { ParticipantWithNickname, useStream } from "../../app/hooks/useStream";
 import { Participant } from "../../app/types";
 import { isRoomIdQuery } from "../../app/utils/queries";
+import { useOops } from "../../app/hooks/useOops";
+import { FrontError } from "../../app/errors";
 
 const useRoomId = () => {
   const router = useRouter();
@@ -38,6 +41,21 @@ const useRoomId = () => {
     const roomId = router.query.roomId;
     setRoomId(roomId);
   }, [router.query, setRoomId]);
+};
+
+const toLocalParticipant = (participant: ParticipantWithNickname) => {
+  return {
+    isDisconnected: participant.isDisconnected,
+    isHost: participant.isHost,
+    muteAudio: participant.muteAudio,
+    muteSpeaker: participant.muteSpeaker,
+    mutedAudio: participant.mutedAudio,
+    mutedSpeaker: participant.mutedSpeaker,
+    isLocalAudioMuted: false,
+    nickname: participant.nickname,
+    peerId: participant.peerId,
+    stream: null,
+  } as Participant;
 };
 
 const useRoomInfo = () => {
@@ -60,22 +78,7 @@ const useRoomInfo = () => {
         setTitle(res.title);
         setDescription(res.description);
         setMaximumParticipants(Number(res.maximumParticipants));
-        setParticipants(
-          res.participants.map(
-            (participant) =>
-              ({
-                isDisconnected: participant.isDisconnected,
-                isHost: participant.isHost,
-                muteAudio: participant.muteAudio,
-                muteSpeaker: participant.muteSpeaker,
-                mutedAudio: participant.mutedAudio,
-                mutedSpeaker: participant.mutedSpeaker,
-                nickname: participant.nickname,
-                peerId: participant.peerId,
-                stream: null,
-              } as Participant),
-          ),
-        );
+        setParticipants(res.participants.map(toLocalParticipant));
         setChats(res.chats.map((chat: any) => JSON.parse(chat)));
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -101,7 +104,7 @@ const useRealtimeApi = () => {
   const setMaximumParticipants = useUpdateAtom(roomMaximumParticipantsAtom);
   const setParticipants = useUpdateAtom(participantsAtom);
   const setChats = useUpdateAtom(chatsAtom);
-  const nickname = useAtomValue(nicknameAtom);
+  const authorNickname = useAtomValue(nicknameAtom);
   const setPeerId = useUpdateAtom(peerIdAtom);
   const setIsHost = useUpdateAtom(isHostAtom);
   const setMuteAudio = useUpdateAtom(muteAudioAtom);
@@ -114,6 +117,8 @@ const useRealtimeApi = () => {
   const resetNickname = useResetAtom(nicknameAtom);
   const resetPeerId = useResetAtom(peerIdAtom);
   const resetIsHost = useResetAtom(isHostAtom);
+  const updateParticipant = useUpdateAtom(participantUpdaterAtom);
+  const setOops = useOops();
 
   useEffect(() => {
     stream.on("chat", (chat) => {
@@ -153,61 +158,25 @@ const useRealtimeApi = () => {
           const participant = data.body;
           setParticipants((participants) => [
             ...participants,
-            {
-              isDisconnected: participant.isDisconnected,
-              isHost: participant.isHost,
-              muteAudio: participant.muteAudio,
-              muteSpeaker: participant.muteSpeaker,
-              mutedAudio: participant.mutedAudio,
-              mutedSpeaker: participant.mutedSpeaker,
-              nickname: participant.nickname,
-              peerId: participant.peerId,
-              stream: null,
-            } as Participant,
+            toLocalParticipant(participant),
           ]);
           break;
         }
         case "update": {
           const participant = data.body;
-          setParticipants((participants) =>
-            participants.map((part) => {
-              if (part.nickname === participant.nickname) {
-                return {
-                  ...part,
-                  ...participant,
-                };
-              } else {
-                return part;
-              }
-            }),
-          );
-          if (participant.nickname === nickname) {
-            if (participant.peerId != null) {
-              setPeerId(participant.peerId);
-            }
-            if (participant.isHost != null) {
-              setIsHost(participant.isHost);
-            }
-            if (participant.muteAudio != null) {
-              setMuteAudio(participant.muteAudio);
-            }
-            if (participant.muteSpeaker != null) {
-              setMuteSpeaker(participant.muteSpeaker);
-            }
-            if (participant.mutedAudio != null) {
-              setMutedAudio(participant.mutedAudio);
-            }
-            if (participant.mutedSpeaker != null) {
-              setMutedSpeaker(participant.mutedSpeaker);
-            }
-          }
+          updateParticipant(participant);
           break;
         }
         case "delete": {
           const nickname = data.body;
           setParticipants((participants) =>
-            participants.filter((part) => part.nickname === nickname),
+            participants.filter((part) => part.nickname !== nickname),
           );
+          if (authorNickname === nickname) {
+            setOops(
+              new FrontError("강제 퇴장 되셨습니다", { pageError: true }),
+            );
+          }
           break;
         }
         case "delete_all": {
@@ -216,11 +185,14 @@ const useRealtimeApi = () => {
           resetNickname();
           resetPeerId();
           resetIsHost();
+          setOops(
+            new FrontError("짜잔 방이 사라졌습니다", { pageError: true }),
+          );
         }
       }
     });
   }, [
-    nickname,
+    authorNickname,
     resetAuthorId,
     resetIsHost,
     resetNickname,
@@ -235,10 +207,12 @@ const useRealtimeApi = () => {
     setMuteSpeaker,
     setMutedAudio,
     setMutedSpeaker,
+    setOops,
     setParticipants,
     setPeerId,
     setTitle,
     stream,
+    updateParticipant,
   ]);
 };
 

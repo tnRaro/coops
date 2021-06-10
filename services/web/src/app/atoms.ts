@@ -1,4 +1,4 @@
-import { Chat } from "@coops/redis/dist/chat/types";
+import type * as redis from "@coops/redis";
 import { atom } from "jotai";
 import { atomWithReset } from "jotai/utils";
 
@@ -24,6 +24,49 @@ export const roomTitleAtom = atomWithReset<string | null>(null);
 export const roomDescriptionAtom = atomWithReset<string | null>(null);
 export const roomMaximumParticipantsAtom = atomWithReset<number | null>(null);
 export const participantsAtom = atomWithReset<Participant[]>([]);
-export const chatsAtom = atomWithReset<Chat[]>([]);
+export const chatsAtom = atomWithReset<redis.chat.types.Chat[]>([]);
 
 export const errorAtom = atomWithReset<Error | null>(null);
+
+export const participantUpdaterAtom = atom(
+  null,
+  (
+    get,
+    set,
+    participant: Partial<Participant> & { nickname: Participant["nickname"] },
+  ) => {
+    set(
+      participantsAtom,
+      get(participantsAtom).map((part) => {
+        if (part.nickname === participant.nickname) {
+          return {
+            ...part,
+            ...participant,
+          };
+        } else {
+          return part;
+        }
+      }),
+    );
+    if (participant.nickname === get(nicknameAtom)) {
+      if (participant.peerId != null) {
+        set(peerIdAtom, participant.peerId);
+      }
+      if (participant.isHost != null) {
+        set(isHostAtom, participant.isHost);
+      }
+      if (participant.muteAudio != null) {
+        set(muteAudioAtom, participant.muteAudio);
+      }
+      if (participant.muteSpeaker != null) {
+        set(muteSpeakerAtom, participant.muteSpeaker);
+      }
+      if (participant.mutedAudio != null) {
+        set(mutedAudioAtom, participant.mutedAudio);
+      }
+      if (participant.mutedSpeaker != null) {
+        set(mutedSpeakerAtom, participant.mutedSpeaker);
+      }
+    }
+  },
+);

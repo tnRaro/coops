@@ -67,7 +67,7 @@ interface ChatListProps {}
 export const ChatList: React.VFC<ChatListProps> = () => {
   const chats = useAtomValue(chatsAtom);
   const participants = useAtomValue(participantsAtom);
-  const myNickname = useAtomValue(nicknameAtom);
+  const authorNickname = useAtomValue(nicknameAtom);
   const participantMap = useMemo(
     () =>
       new Map(
@@ -78,7 +78,7 @@ export const ChatList: React.VFC<ChatListProps> = () => {
   return (
     <Scroll direction="vertical" gap="10" y>
       {chats.slice(-100).map((chat) => {
-        const isMe = chat.nickname === myNickname;
+        const isMe = chat.nickname === authorNickname;
         const isHost = participantMap.get(chat.nickname)?.isHost ?? false;
         return (
           <MemoizedChatItem

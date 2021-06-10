@@ -1,8 +1,6 @@
 import * as redis from "@coops/redis";
 import { RedisClient } from "redis";
 
-import { clearParticipants } from "../participant/clearParticipants";
-
 import { createRoom } from "./createRoom";
 import { removeRoom } from "./removeRoom";
 

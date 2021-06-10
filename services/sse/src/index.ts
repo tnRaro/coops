@@ -14,9 +14,9 @@ app.use("/sse/rooms/:roomId", async (req, res, next) => {
   const roomId = req.params.roomId;
   const [pubsub, quit0] = getRedisClient();
   const [client, quit1] = getRedisClient();
-  const quit = () => {
-    quit0();
-    quit1();
+  const quit = async () => {
+    await quit0();
+    await quit1();
   };
   try {
     const { key } = req.query;
@@ -80,20 +80,36 @@ app.use("/sse/rooms/:roomId", async (req, res, next) => {
       authorId,
       "nickname",
     );
-    await logic.participant.setParticipant(client, roomId, authorId, nickname, {
-      isDisconnected: false,
-    });
-    res.on("close", async () => {
-      isRunning = false;
+    try {
       await logic.participant.setParticipant(
         client,
         roomId,
         authorId,
         nickname,
         {
-          isDisconnected: true,
+          isDisconnected: false,
         },
       );
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+    }
+    res.on("close", async () => {
+      isRunning = false;
+      try {
+        await logic.participant.setParticipant(
+          client,
+          roomId,
+          authorId,
+          nickname,
+          {
+            isDisconnected: true,
+          },
+        );
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
       const unsubscribe: (key: string) => Promise<string> = util
         .promisify(pubsub.unsubscribe)
         .bind(pubsub);

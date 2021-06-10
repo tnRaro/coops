@@ -1,3 +1,4 @@
+import { Portal } from "@radix-ui/react-portal";
 import { useAtomValue, useUpdateAtom } from "jotai/utils";
 import React from "react";
 import {
@@ -79,13 +80,13 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
     isLocalAudioMuted,
     nickname,
   } = props;
+  const isAuthor = authorNickname === nickname;
   const toggleAudio = React.useCallback(async () => {
     try {
       if (roomId == null) return;
       if (authorId == null) return;
       if (nickname == null) return;
-      const isMe = authorNickname === nickname;
-      if (isMe) {
+      if (isAuthor) {
         if (muteAudio) {
           await queries.unmuteMicrophone(roomId, nickname, authorId);
         } else {
@@ -110,7 +111,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
     roomId,
     authorId,
     nickname,
-    authorNickname,
+    isAuthor,
     props.isLocalAudioMuted,
     props.nickname,
     muteAudio,
@@ -122,8 +123,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
       if (roomId == null) return;
       if (authorId == null) return;
       if (nickname == null) return;
-      const isMe = authorNickname === nickname;
-      if (isMe) {
+      if (isAuthor) {
         if (muteSpeaker) {
           await queries.unmuteSpeaker(roomId, nickname, authorId);
         } else {
@@ -134,7 +134,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
       // eslint-disable-next-line no-console
       console.error(error);
     }
-  }, [authorId, muteSpeaker, authorNickname, nickname, queries, roomId]);
+  }, [roomId, authorId, nickname, isAuthor, muteSpeaker, queries]);
   const toggleServerAudio = React.useCallback(async () => {
     try {
       if (mutedAudio) {
@@ -163,7 +163,23 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
   if (authorId == null) return null;
   if (nickname == null) return null;
   return (
-    <Flex gap="10" align="center" css={{ color: "$text66" }}>
+    <Flex
+      gap="10"
+      align="center"
+      css={{
+        color: "$text66",
+        background: "var(---color)",
+        boxShadow: "0 0 0 8px var(---color)",
+        borderRadius: "1px",
+      }}
+      style={
+        isAuthor
+          ? ({
+              "---color": "var(--colors-elevation2)",
+            } as any)
+          : undefined
+      }
+    >
       {props.isHost ? <RiVipCrownFill /> : <RiUserFill />}
       <Text
         css={{
@@ -193,7 +209,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
           isServerMuted={mutedSpeaker}
           isSharingMuted={muteSpeaker}
           onClick={toggleSpeaker}
-          isDisabled={authorNickname !== nickname}
+          isDisabled={!isAuthor}
         />
         <DropdownMenu.Root>
           <DropdownMenu.Trigger as={Button} size="square8" color="transparent">
@@ -207,7 +223,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
               value="마이크 음소거"
               onChange={toggleAudio}
             />
-            {authorIsHost && nickname !== authorNickname && (
+            {authorIsHost && !isAuthor && (
               <>
                 <DropdownMenu.Separator />
                 <MemoizedCheckboxItem
@@ -276,7 +292,11 @@ export const ParticipantControlPanel: React.VFC<ParticipantControlPanelProps> = 
     <Flex
       gap="10"
       align="center"
-      css={{ background: "$elevation0", padding: "$10", borderRadius: "$8" }}
+      css={{
+        background: "$elevation1",
+        padding: "$10",
+        borderRadius: "$8 $8 0 0",
+      }}
     >
       {isHost ? <RiVipCrownFill /> : <RiUserFill />}
       <Text
@@ -368,7 +388,7 @@ export const ParticipantListCard: React.VFC<ParticipantListCardProps> = () => {
           />
         ))}
       </Flex>
-      <ParticipantControlPanel />
+      {/* <ParticipantControlPanel /> */}
     </>
   );
 };

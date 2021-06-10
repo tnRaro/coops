@@ -1,5 +1,6 @@
 import type * as redis from "@coops/redis";
 
+import type { ParticipantWithNickname } from "../hooks/useStream";
 import { fetchWrapper } from "../utils/fetchWrapper";
 
 export const createRoom = (title: string) => {
@@ -14,7 +15,7 @@ export const getRoom = (roomId: string, authorId?: string | null) => {
     title: string;
     description: string;
     maximumParticipants: number;
-    participants: Omit<redis.participant.types.Participant, "participantId">[];
+    participants: ParticipantWithNickname[];
     chats: string[];
   }>({
     url: `/api/rooms/${roomId}`,

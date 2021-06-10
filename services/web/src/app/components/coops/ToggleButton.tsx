@@ -77,6 +77,11 @@ export const AudioControlButton: React.VFC<AudioControlButtonProps> = (
       style={{
         color,
       }}
+      css={{
+        "&:disabled": {
+          color: "inherit",
+        },
+      }}
       onClick={props.onClick}
     >
       <Icon />

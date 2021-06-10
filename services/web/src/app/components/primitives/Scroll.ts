@@ -11,6 +11,7 @@ export const Scroll = styled(Flex, {
   "&::-webkit-scrollbar": {
     background: "$$scrollbarColor",
     width: "8px",
+    height: "8px",
     borderRadius: "$full",
   },
   "&::-webkit-scrollbar-thumb": {

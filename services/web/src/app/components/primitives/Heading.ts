@@ -1,6 +1,4 @@
-import { InternalCSS } from "@stitches/core";
-
-import { styled } from "../../stitches.config";
+import { CSS, styled } from "../../stitches.config";
 
 const defaultStyles = {
   appearance: "none",
@@ -11,7 +9,7 @@ const defaultStyles = {
   lineHeight: "$heading",
   padding: 0,
   margin: 0,
-} as InternalCSS;
+} as CSS;
 
 export const Heading1 = styled("h1", {
   ...defaultStyles,

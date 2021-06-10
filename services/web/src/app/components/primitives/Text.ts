@@ -1,6 +1,4 @@
-import { InternalCSS } from "@stitches/react";
-
-import { styled, theme } from "../../stitches.config";
+import { CSS, styled, theme } from "../../stitches.config";
 
 import * as properties from "./properties";
 
@@ -9,28 +7,28 @@ const color = Object.entries(theme.colors).reduce((variants, [key, value]) => {
     ...variants,
     [key]: {
       color: `$${key}`,
-    } as InternalCSS,
+    } as CSS,
   };
-}, {}) as { [index in keyof typeof theme.colors]: InternalCSS };
+}, {}) as { [index in keyof typeof theme.colors]: CSS };
 const align = properties.textAlign.reduce((variants, value) => {
   return {
     ...variants,
     [value]: {
       textAlign: value,
-    } as InternalCSS,
+    } as CSS,
   };
 }, {}) as {
-  [index in typeof properties.textAlign[number]]: InternalCSS;
+  [index in typeof properties.textAlign[number]]: CSS;
 };
 const whiteSpace = properties.whiteSpace.reduce((variants, value) => {
   return {
     ...variants,
     [value]: {
       whiteSpace: value,
-    } as InternalCSS,
+    } as CSS,
   };
 }, {}) as {
-  [index in typeof properties.whiteSpace[number]]: InternalCSS;
+  [index in typeof properties.whiteSpace[number]]: CSS;
 };
 
 export const Text = styled("p", {

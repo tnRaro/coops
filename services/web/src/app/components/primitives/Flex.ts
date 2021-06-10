@@ -1,6 +1,4 @@
-import { InternalCSS } from "@stitches/react";
-
-import { styled, theme } from "../../stitches.config";
+import { CSS, styled, theme } from "../../stitches.config";
 
 import { alignItems, justifyContent } from "./properties";
 
@@ -9,29 +7,29 @@ const justify = justifyContent.reduce((variants, value) => {
     ...variants,
     [value]: {
       justifyContent: value,
-    } as InternalCSS,
+    } as CSS,
   };
 }, {}) as {
-  [index in typeof justifyContent[number]]: InternalCSS;
+  [index in typeof justifyContent[number]]: CSS;
 };
 const align = alignItems.reduce((variants, value) => {
   return {
     ...variants,
     [value]: {
       alignItems: value,
-    } as InternalCSS,
+    } as CSS,
   };
 }, {}) as {
-  [index in typeof alignItems[number]]: InternalCSS;
+  [index in typeof alignItems[number]]: CSS;
 };
 const gap = Object.entries(theme.space).reduce((variants, [key, value]) => {
   return {
     ...variants,
     [key]: {
       gap: `$${key}`,
-    } as InternalCSS,
+    } as CSS,
   };
-}, {}) as { [index in keyof typeof theme.space]: InternalCSS };
+}, {}) as { [index in keyof typeof theme.space]: CSS };
 export const Flex = styled("div", {
   appearance: "none",
   boxSizing: "border-box",

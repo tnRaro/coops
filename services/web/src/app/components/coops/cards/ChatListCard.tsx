@@ -1,3 +1,4 @@
+import { Chat } from "@coops/redis/dist/chat/types";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -18,12 +19,55 @@ import { Input } from "../../primitives/Input";
 import { Scroll } from "../../primitives/Scroll";
 import { Text } from "../../primitives/Text";
 
+interface ChatItemProps extends Chat {
+  isHost: boolean;
+  isMe: boolean;
+}
+const ChatItem: React.VFC<ChatItemProps> = (props) => {
+  const chatRef = useRef<HTMLDivElement | null>(null);
+  const color = props.isMe ? "primary100" : "text100";
+  const Icon = props.isHost ? RiVipCrownFill : RiUserFill;
+  useEffect(() => {
+    chatRef.current?.scrollIntoView({
+      block: "end",
+    });
+  }, []);
+  return (
+    // eslint-disable-next-line @shopify/jsx-no-hardcoded-content
+    <Text ref={chatRef}>
+      <Icon />
+      <Text
+        as="span"
+        color={color}
+        css={{
+          wordBreak: "break-all",
+        }}
+      >
+        {props.nickname}
+      </Text>
+      {": "}
+      <Text
+        as="span"
+        color="text66"
+        css={{
+          wordBreak: "break-all",
+          "&:hover": {
+            color: "$text100",
+          },
+        }}
+      >
+        {props.message}
+      </Text>
+    </Text>
+  );
+};
+const MemoizedChatItem = React.memo(ChatItem);
+
 interface ChatListProps {}
 export const ChatList: React.VFC<ChatListProps> = () => {
   const chats = useAtomValue(chatsAtom);
-  const myNickname = useAtomValue(nicknameAtom);
-  const latestChatRef = useRef<HTMLDivElement | null>(null);
   const participants = useAtomValue(participantsAtom);
+  const myNickname = useAtomValue(nicknameAtom);
   const participantMap = useMemo(
     () =>
       new Map(
@@ -31,37 +75,18 @@ export const ChatList: React.VFC<ChatListProps> = () => {
       ),
     [participants],
   );
-  useEffect(() => {
-    latestChatRef.current?.scrollIntoView({
-      block: "end",
-    });
-  }, [chats.length]);
   return (
     <Scroll direction="vertical" gap="10" y>
       {chats.slice(-100).map((chat) => {
         const isMe = chat.nickname === myNickname;
-        const isHost = participantMap.get(chat.nickname)?.isHost;
+        const isHost = participantMap.get(chat.nickname)?.isHost ?? false;
         return (
-          // eslint-disable-next-line @shopify/jsx-no-hardcoded-content
-          <Text ref={latestChatRef} key={chat.id}>
-            {isHost ? <RiVipCrownFill /> : <RiUserFill />}
-            <Text as="span" color={isMe ? "primary100" : "text100"}>
-              {chat.nickname}
-            </Text>
-            {": "}
-            <Text
-              as="span"
-              color="text66"
-              css={{
-                wordBreak: "break-all",
-                "&:hover": {
-                  color: "$text100",
-                },
-              }}
-            >
-              {chat.message}
-            </Text>
-          </Text>
+          <MemoizedChatItem
+            key={chat.id}
+            isMe={isMe}
+            isHost={isHost}
+            {...chat}
+          />
         );
       })}
     </Scroll>

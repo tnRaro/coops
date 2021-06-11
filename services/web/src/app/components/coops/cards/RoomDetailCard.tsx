@@ -141,7 +141,7 @@ export const RoomDetailCard: React.VFC<RoomDetailCardProps> = () => {
             }
           }}
         >
-          {description ?? "공지사항을 입력해주세요"}
+          {description ?? (isHost && "공지사항을 입력해주세요")}
         </Text>
       )}
     </>

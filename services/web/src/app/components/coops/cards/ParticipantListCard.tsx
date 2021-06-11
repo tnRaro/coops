@@ -1,4 +1,3 @@
-import { Portal } from "@radix-ui/react-portal";
 import { useAtomValue, useUpdateAtom } from "jotai/utils";
 import React from "react";
 import {
@@ -18,6 +17,7 @@ import {
   authorIdAtom,
   isHostAtom,
   muteAudioAtom,
+  mutedSpeakerAtom,
   muteSpeakerAtom,
   nicknameAtom,
   participantsAtom,
@@ -35,6 +35,8 @@ import { AudioControlButton, ToggleButton } from "../ToggleButton";
 
 interface AudioProps {
   stream: MediaStream;
+  isMuted: boolean;
+  volume: number;
 }
 export const Audio: React.VFC<AudioProps> = (props) => {
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
@@ -42,8 +44,12 @@ export const Audio: React.VFC<AudioProps> = (props) => {
     if (audioRef.current == null) return;
     audioRef.current.srcObject = props.stream;
   }, [props.stream]);
+  React.useEffect(() => {
+    if (audioRef.current == null) return;
+    audioRef.current.volume = Math.max(0, Math.min(1, props.volume ?? 1));
+  }, [props.volume]);
   return (
-    <audio ref={audioRef} autoPlay controls>
+    <audio ref={audioRef} muted={props.isMuted} autoPlay controls>
       <track kind="captions" />
     </audio>
   );
@@ -97,6 +103,8 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
     nickname,
     stream,
   } = props;
+  const authorMuteSpeaker = useAtomValue(muteSpeakerAtom);
+  const authorMutedSpeaker = useAtomValue(mutedSpeakerAtom);
   const isAuthor = authorNickname === nickname;
   const toggleAudio = React.useCallback(async () => {
     try {
@@ -287,7 +295,19 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>
-      {!isAuthor && stream != null ? <Audio stream={stream} /> : undefined}
+      {!isAuthor && stream != null ? (
+        <Audio
+          stream={stream}
+          isMuted={
+            authorMuteSpeaker ||
+            authorMutedSpeaker ||
+            muteAudio ||
+            mutedAudio ||
+            isLocalAudioMuted
+          }
+          volume={1}
+        />
+      ) : undefined}
     </Flex>
   );
 };

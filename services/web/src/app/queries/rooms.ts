@@ -25,6 +25,7 @@ export const getRoom = (roomId: string, authorId?: string | null) => {
 export const resetRoom = (roomId: string, authorId: string) => {
   return fetchWrapper<{ roomId: string }>({
     url: `/api/rooms/${roomId}`,
+    method: "PUT",
     authorId,
   });
 };

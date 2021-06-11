@@ -150,6 +150,7 @@ const useRealtimeApi = () => {
         }
         case "delete": {
           resetRoom();
+          setOops(new FrontError("방이 이제 없습니다", { pageError: true }));
           break;
         }
       }
@@ -175,21 +176,13 @@ const useRealtimeApi = () => {
             participants.filter((part) => part.nickname !== nickname),
           );
           if (authorNickname === nickname) {
-            setOops(
-              new FrontError("강제 퇴장 되셨습니다", { pageError: true }),
-            );
+            setOops(new FrontError("연결이 끊겼습니다", { pageError: true }));
           }
           break;
         }
         case "delete_all": {
-          resetParticipants();
-          resetAuthorId();
-          resetNickname();
-          resetPeerId();
-          resetIsHost();
-          setOops(
-            new FrontError("짜잔 방이 사라졌습니다", { pageError: true }),
-          );
+          resetRoom();
+          setOops(new FrontError("방이 이제 없습니다", { pageError: true }));
         }
       }
     });

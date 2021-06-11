@@ -1,5 +1,5 @@
 import { useAtomValue, useUpdateAtom } from "jotai/utils";
-import React from "react";
+import React, { useState } from "react";
 import {
   RiCheckboxBlankLine,
   RiCheckboxFill,
@@ -29,6 +29,12 @@ import { Participant } from "../../../types";
 import { Button } from "../../primitives/Button";
 import { Flex } from "../../primitives/Flex";
 import { Heading4 } from "../../primitives/Heading";
+import {
+  SliderRoot,
+  SliderRange,
+  SliderThumb,
+  SliderTrack,
+} from "../../primitives/Slider";
 import { Text } from "../../primitives/Text";
 import * as DropdownMenu from "../DropdownMenu";
 import { AudioControlButton, ToggleButton } from "../ToggleButton";
@@ -46,10 +52,10 @@ export const Audio: React.VFC<AudioProps> = (props) => {
   }, [props.stream]);
   React.useEffect(() => {
     if (audioRef.current == null) return;
-    audioRef.current.volume = Math.max(0, Math.min(1, props.volume ?? 1));
+    audioRef.current.volume = Math.max(0, Math.min(1, props.volume ?? 0.5));
   }, [props.volume]);
   return (
-    <audio ref={audioRef} muted={props.isMuted} autoPlay controls>
+    <audio ref={audioRef} muted={props.isMuted} autoPlay>
       <track kind="captions" />
     </audio>
   );
@@ -106,6 +112,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
   const authorMuteSpeaker = useAtomValue(muteSpeakerAtom);
   const authorMutedSpeaker = useAtomValue(mutedSpeakerAtom);
   const isAuthor = authorNickname === nickname;
+  const [audioVolume, setAudioVolume] = useState(0.5);
   const toggleAudio = React.useCallback(async () => {
     try {
       if (roomId == null) return;
@@ -241,8 +248,27 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
             <RiSettings3Fill />
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
-            <DropdownMenu.Label>사용자 음량</DropdownMenu.Label>
-            <DropdownMenu.Label>음량 조절 바</DropdownMenu.Label>
+            {!isAuthor && (
+              <>
+                <DropdownMenu.Label>사용자 음량</DropdownMenu.Label>
+                <DropdownMenu.Label>
+                  <SliderRoot
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    value={[audioVolume]}
+                    onValueChange={(value) => {
+                      setAudioVolume(value[0]);
+                    }}
+                  >
+                    <SliderTrack>
+                      <SliderRange />
+                    </SliderTrack>
+                    <SliderThumb />
+                  </SliderRoot>
+                </DropdownMenu.Label>
+              </>
+            )}
             <MemoizedCheckboxItem
               isChecked={muteAudio}
               value="마이크 음소거"
@@ -305,7 +331,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
             mutedAudio ||
             isLocalAudioMuted
           }
-          volume={1}
+          volume={audioVolume}
         />
       ) : undefined}
     </Flex>

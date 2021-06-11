@@ -6,9 +6,10 @@ import { Flex } from "../primitives/Flex";
 interface SmallCardProps {
   children: React.ReactNode;
   css?: CSS;
+  hasGradient?: boolean;
 }
 export const SmallCard: React.VFC<SmallCardProps> = (props) => {
-  const { children, css, ...rest } = props;
+  const { children, css, hasGradient, ...rest } = props;
   return (
     <Flex
       direction="vertical"
@@ -23,6 +24,13 @@ export const SmallCard: React.VFC<SmallCardProps> = (props) => {
         } as CSS
       }
       {...rest}
+      style={
+        hasGradient
+          ? {
+              background: "var(--colors-cardGradient)",
+            }
+          : undefined
+      }
     >
       {children}
     </Flex>

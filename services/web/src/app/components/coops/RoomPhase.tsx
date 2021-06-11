@@ -15,7 +15,10 @@ export const RoomRhase: React.VFC<RoomRhaseProps> = () => {
     <Flex direction={direction} gap="10" css={{ flex: 1 }}>
       <Flex direction="vertical" css={{ flex: "0 1 480px" }}>
         <Scroll direction="vertical" gap="10" y>
-          <SmallCard css={{ background: "$cardGradient" }}>
+          <SmallCard hasGradient>
+            <Heading4>COOPS</Heading4>
+          </SmallCard>
+          <SmallCard hasGradient>
             <InviteCodeCard />
           </SmallCard>
           <SmallCard>
@@ -32,7 +35,7 @@ export const RoomRhase: React.VFC<RoomRhaseProps> = () => {
         gap="10"
         css={{ flex: "1 1 480px", minWidth: 0 }}
       >
-        <SmallCard css={{ background: "$cardGradient" }}>
+        <SmallCard hasGradient>
           <RoomDetailCard />
         </SmallCard>
         <SmallCard css={{ flex: "1" }}>

@@ -2,7 +2,7 @@ import { useAtom } from "jotai";
 import { useUpdateAtom } from "jotai/utils";
 import { useEffect } from "react";
 
-import { deviceIdAtom, devicesAtom } from "../atoms/deviceAtoms";
+import { deviceIdAtom, devicesAtom } from "../atoms";
 
 export const useMediaDevices = () => {
   const [devices, setDevices] = useAtom(devicesAtom);

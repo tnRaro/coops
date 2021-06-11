@@ -1,6 +1,7 @@
 import type * as redis from "@coops/redis";
 import { atom } from "jotai";
 import { atomWithReset } from "jotai/utils";
+import Peer from "peerjs";
 
 import type { Toast } from "./hooks/useToast";
 import { Participant } from "./types";
@@ -70,3 +71,24 @@ export const participantUpdaterAtom = atom(
     }
   },
 );
+
+export const streamUpdaterAtom = atom(
+  null,
+  (get, set, participant: Pick<Participant, "peerId" | "stream">) => {
+    set(
+      participantsAtom,
+      get(participantsAtom).map((part) => {
+        if (part.peerId === participant.peerId) {
+          return {
+            ...part,
+            stream: participant.stream,
+          };
+        } else {
+          return part;
+        }
+      }),
+    );
+  },
+);
+
+export const peerAtom = atom<Peer | null>(null);

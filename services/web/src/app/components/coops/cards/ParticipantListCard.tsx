@@ -33,6 +33,22 @@ import { Text } from "../../primitives/Text";
 import * as DropdownMenu from "../DropdownMenu";
 import { AudioControlButton, ToggleButton } from "../ToggleButton";
 
+interface AudioProps {
+  stream: MediaStream;
+}
+export const Audio: React.VFC<AudioProps> = (props) => {
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  React.useEffect(() => {
+    if (audioRef.current == null) return;
+    audioRef.current.srcObject = props.stream;
+  }, [props.stream]);
+  return (
+    <audio ref={audioRef} autoPlay controls>
+      <track kind="captions" />
+    </audio>
+  );
+};
+
 interface CheckboxItemProps {
   isChecked: boolean;
   onChange: (isChecked: boolean) => void | Promise<void>;
@@ -79,6 +95,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
     mutedSpeaker,
     isLocalAudioMuted,
     nickname,
+    stream,
   } = props;
   const isAuthor = authorNickname === nickname;
   const toggleAudio = React.useCallback(async () => {
@@ -270,6 +287,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>
+      {!isAuthor && stream != null ? <Audio stream={stream} /> : undefined}
     </Flex>
   );
 };

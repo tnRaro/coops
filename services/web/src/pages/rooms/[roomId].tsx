@@ -22,13 +22,15 @@ import {
 } from "../../app/atoms";
 import { LoginPhase } from "../../app/components/coops/LoginPhase";
 import { RoomRhase } from "../../app/components/coops/RoomPhase";
+import { FrontError } from "../../app/errors";
+import { useMediaDevices } from "../../app/hooks/useMediaDevices";
+import { useOops } from "../../app/hooks/useOops";
+import { useSettingPeer } from "../../app/hooks/usePeer";
 import { useQuery } from "../../app/hooks/useQuery";
 import { useResetRoom } from "../../app/hooks/useResetRoom";
 import { ParticipantWithNickname, useStream } from "../../app/hooks/useStream";
 import { Participant } from "../../app/types";
 import { isRoomIdQuery } from "../../app/utils/queries";
-import { useOops } from "../../app/hooks/useOops";
-import { FrontError } from "../../app/errors";
 
 const useRoomId = () => {
   const router = useRouter();
@@ -221,6 +223,8 @@ const Page: VoidFunctionComponent<PageProps> = (props) => {
   useRoomId();
   useRoomInfo();
   useRealtimeApi();
+  useMediaDevices();
+  useSettingPeer();
   const roomId = useAtomValue(roomIdAtom);
   const authorId = useAtomValue(authorIdAtom);
 

@@ -7,6 +7,7 @@ import { ChatListCard } from "./cards/ChatListCard";
 import { InviteCodeCard } from "./cards/InviteCodeCard";
 import { ParticipantListCard } from "./cards/ParticipantListCard";
 import { RoomDetailCard } from "./cards/RoomDetailCard";
+import { CoopsLogo } from "./logo";
 
 interface RoomRhaseProps {}
 export const RoomRhase: React.VFC<RoomRhaseProps> = () => {
@@ -16,9 +17,12 @@ export const RoomRhase: React.VFC<RoomRhaseProps> = () => {
       <Flex direction="vertical" css={{ flex: "0 1 480px" }}>
         <Scroll direction="vertical" gap="10" y>
           <SmallCard hasGradient>
-            <Heading4>COOPS</Heading4>
+            <Flex align="center" gap="10">
+              <CoopsLogo />
+              <Heading4>COOPS</Heading4>
+            </Flex>
           </SmallCard>
-          <SmallCard hasGradient>
+          <SmallCard>
             <InviteCodeCard />
           </SmallCard>
           <SmallCard>

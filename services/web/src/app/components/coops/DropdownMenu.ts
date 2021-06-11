@@ -6,7 +6,7 @@ export const Root = DropdownMenu.Root;
 export const Trigger = DropdownMenu.Trigger;
 export const Content = styled(DropdownMenu.Content, {
   boxSizing: "border-box",
-  background: "$elevation2",
+  background: "black",
   boxShadow: "$popOut",
   padding: "$8",
   minWidth: "240px",

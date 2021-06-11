@@ -5,8 +5,22 @@ services:
     image: nginx:1.21.0-alpine
     volumes:
       - ../../templates:/etc/nginx/templates
+      - ../../.secret/certbot/conf:/etc/letsencrypt
+      - ../../.secret/certbot/lib:/var/lib/letsencrypt
+      - ../../.secret/certbot/www:/var/www/certbot
     ports:
-      - 3000:80
+      - 443:443
+      - 80:80
+    environment:
+      - NGINX_SERVER_NAME=coops.tnraro.com
+  # certbot:
+  #   image: certbot/certbot
+  #   # command: certonly --webroot -w /var/www/certbot -d coops.tnraro.com -m admin@tnraro.com --agree-tos
+  #   entrypoint: certbot renew
+  #   volumes:
+  #     - ./.secret/certbot/conf:/etc/letsencrypt
+  #     - ./.secret/certbot/lib:/var/lib/letsencrypt
+  #     - ./.secret/certbot/www:/var/www/certbot
   web:
     command: yarn web dev
     build:

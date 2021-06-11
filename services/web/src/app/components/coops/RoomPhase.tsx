@@ -12,10 +12,27 @@ import { CoopsLogo } from "./logo";
 
 interface RoomRhaseProps {}
 export const RoomRhase: React.VFC<RoomRhaseProps> = () => {
-  const direction = "horizontal";
   return (
-    <Flex direction={direction} gap="10" css={{ flex: 1 }}>
-      <Flex direction="vertical" css={{ flex: "0 1 480px" }}>
+    <Flex
+      direction={{
+        "@initial": "horizontal",
+        "@bp": "vertical",
+      }}
+      reverse={{
+        "@initial": false,
+        "@bp": true,
+      }}
+      gap="10"
+      css={{ flex: 1 }}
+    >
+      <Flex
+        direction="vertical"
+        css={{
+          flex: "1 1",
+          "@initial": { maxWidth: "480px" },
+          "@bp": { maxWidth: "initial" },
+        }}
+      >
         <Scroll direction="vertical" gap="10" y>
           <SmallCard hasGradient>
             <Flex align="center" gap="10">
@@ -34,11 +51,7 @@ export const RoomRhase: React.VFC<RoomRhaseProps> = () => {
           </SmallCard>
         </Scroll>
       </Flex>
-      <Flex
-        direction="vertical"
-        gap="10"
-        css={{ flex: "1 1 480px", minWidth: 0 }}
-      >
+      <Flex direction="vertical" gap="10" css={{ flex: "1 1", minWidth: 0 }}>
         <SmallCard hasGradient>
           <RoomDetailCard />
         </SmallCard>

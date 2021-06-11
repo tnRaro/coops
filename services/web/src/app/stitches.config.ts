@@ -102,7 +102,10 @@ const stitchesConfig = createCss({
       popOut: "3",
     },
   },
-  media: {},
+  media: {
+    bp: "(max-width: 800px)",
+    bpr: "(min-width: 800px)",
+  },
 });
 
 export const { styled, css, keyframes, getCssString, theme } = stitchesConfig;

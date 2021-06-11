@@ -18,6 +18,13 @@ export const Card: React.VFC<CardProps> = (props) => {
         padding: "$cardPadding",
         borderRadius: "$large",
         boxShadow: "$overlay",
+        "@bp": {
+          padding: 0,
+          borderRadius: 0,
+          minWidth: 0,
+          flex: "1",
+          justifyContent: "center",
+        },
       }}
     >
       <Heading1>{props.title}</Heading1>

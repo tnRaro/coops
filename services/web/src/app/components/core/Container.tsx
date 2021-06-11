@@ -9,8 +9,8 @@ export const Container: React.VFC<ContainerProps> = (props) => {
   return (
     <Flex
       direction="vertical"
-      justify="center"
-      align="center"
+      justify={{ "@bpr": "center", "@bp": "stretch" }}
+      align={{ "@initial": "center", "@bp": "stretch" }}
       css={{ flex: "1" }}
     >
       {props.children}

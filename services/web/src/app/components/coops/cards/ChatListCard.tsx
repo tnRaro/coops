@@ -78,6 +78,9 @@ export const ChatList: React.VFC<ChatListProps> = () => {
   return (
     <Scroll direction="vertical" gap="10" y>
       {chats.slice(-100).map((chat) => {
+        if (chat.nickname == null) {
+          return <Text color="text66">{chat.message}</Text>;
+        }
         const isMe = chat.nickname === authorNickname;
         const isHost = participantMap.get(chat.nickname)?.isHost ?? false;
         return (
@@ -85,7 +88,10 @@ export const ChatList: React.VFC<ChatListProps> = () => {
             key={chat.id}
             isMe={isMe}
             isHost={isHost}
-            {...chat}
+            id={chat.id}
+            createdAt={chat.createdAt}
+            message={chat.message}
+            nickname={chat.nickname}
           />
         );
       })}

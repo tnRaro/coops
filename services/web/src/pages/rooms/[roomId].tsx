@@ -163,11 +163,31 @@ const useRealtimeApi = () => {
             ...participants,
             toLocalParticipant(participant),
           ]);
+          setChats((chats) => [
+            ...chats,
+            {
+              id: Math.random().toString(),
+              createdAt: new Date(),
+              message: `${participant.nickname} 님이 입장했습니다.`,
+              nickname: null,
+            },
+          ]);
           break;
         }
         case "update": {
           const participant = data.body;
           updateParticipant(participant);
+          if (participant.isDisconnected === true) {
+            setChats((chats) => [
+              ...chats,
+              {
+                id: Math.random().toString(),
+                createdAt: new Date(),
+                message: `${participant.nickname} 님이 퇴장했습니다.`,
+                nickname: null,
+              },
+            ]);
+          }
           break;
         }
         case "delete": {

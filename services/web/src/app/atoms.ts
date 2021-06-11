@@ -25,7 +25,14 @@ export const roomTitleAtom = atomWithReset<string | null>(null);
 export const roomDescriptionAtom = atomWithReset<string | null>(null);
 export const roomMaximumParticipantsAtom = atomWithReset<number | null>(null);
 export const participantsAtom = atomWithReset<Participant[]>([]);
-export const chatsAtom = atomWithReset<redis.chat.types.Chat[]>([]);
+export const chatsAtom = atomWithReset<
+  {
+    id: string;
+    message: string;
+    nickname: string | null;
+    createdAt: Date;
+  }[]
+>([]);
 
 export const errorAtom = atomWithReset<Error | null>(null);
 

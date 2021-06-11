@@ -1,6 +1,6 @@
 import { consts } from "@coops/core";
 import { useAtom } from "jotai";
-import { useUpdateAtom } from "jotai/utils";
+import { useAtomValue, useUpdateAtom } from "jotai/utils";
 import React from "react";
 
 import {
@@ -8,6 +8,7 @@ import {
   isHostAtom,
   nicknameAtom,
   peerIdAtom,
+  roomDescriptionAtom,
   roomIdAtom,
   roomTitleAtom,
 } from "../../atoms";
@@ -19,11 +20,13 @@ import { Container } from "../core/Container";
 import { Button } from "../primitives/Button";
 import { Flex } from "../primitives/Flex";
 import { Input } from "../primitives/Input";
+import { Text } from "../primitives/Text";
 
 interface LoginPhaseProps {}
 export const LoginPhase: React.VFC<LoginPhaseProps> = () => {
   const [roomId] = useAtom(roomIdAtom);
   const [title] = useAtom(roomTitleAtom);
+  const description = useAtomValue(roomDescriptionAtom);
   const setAuthorId = useUpdateAtom(authorIdAtom);
   const setGlobalNickname = useUpdateAtom(nicknameAtom);
   const setPeerId = useUpdateAtom(peerIdAtom);
@@ -61,6 +64,7 @@ export const LoginPhase: React.VFC<LoginPhaseProps> = () => {
   return (
     <Container>
       <Card title={title}>
+        <Text>{description}</Text>
         <Flex direction="vertical" gap="10">
           <Input
             placeholder="사용할 이름을 입력해주세요"

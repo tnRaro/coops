@@ -236,7 +236,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
             <DropdownMenu.Label>사용자 음량</DropdownMenu.Label>
             <DropdownMenu.Label>음량 조절 바</DropdownMenu.Label>
             <MemoizedCheckboxItem
-              isChecked={false}
+              isChecked={muteAudio}
               value="마이크 음소거"
               onChange={toggleAudio}
             />

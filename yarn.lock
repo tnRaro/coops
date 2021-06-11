@@ -1451,6 +1451,13 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/context-base/-/context-base-0.14.0.tgz#c67fc20a4d891447ca1a855d7d70fa79a3533001"
   integrity sha512-sDOAZcYwynHFTbLo6n8kIbLiVF3a3BLkrmehJUyEbT9F+Smbi47kLGS2gG2g0fjBLR/Lr1InPD7kXL7FaTqEkw==
 
+"@radix-ui/number@0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@radix-ui/number/-/number-0.0.6.tgz#b99c5397592d4714f2addaac86879e3ed5136acd"
+  integrity sha512-4ezhe9dWl3mSrZ6EaYQE+OhOOT1+KW73FTbpaQmg8rD7RgArnmbSW7gLdWw9X9zq4zv+FGqcTqErxctiG3ZzRA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+
 "@radix-ui/popper@0.0.10":
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/@radix-ui/popper/-/popper-0.0.10.tgz#9f707d9cec8762423f81acaf8e650e40a554cb73"
@@ -1669,6 +1676,23 @@
     "@radix-ui/react-primitive" "0.0.13"
     "@radix-ui/react-use-callback-ref" "0.0.5"
     "@radix-ui/react-use-controllable-state" "0.0.6"
+
+"@radix-ui/react-slider@^0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-slider/-/react-slider-0.0.13.tgz#e62361ad33b786926ccdef9a0c9adf5aaf64e4da"
+  integrity sha512-Ft8L3kJ/W6obKzC19OyPu9R/y52KP5LSPKT2SnQv+46exP4kZJK/yI5M4gst5LIRgijjWNE+THpHFL/8b4EY3g==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/number" "0.0.6"
+    "@radix-ui/primitive" "0.0.5"
+    "@radix-ui/react-compose-refs" "0.0.5"
+    "@radix-ui/react-context" "0.0.5"
+    "@radix-ui/react-polymorphic" "0.0.11"
+    "@radix-ui/react-primitive" "0.0.13"
+    "@radix-ui/react-use-callback-ref" "0.0.5"
+    "@radix-ui/react-use-controllable-state" "0.0.6"
+    "@radix-ui/react-use-layout-effect" "0.0.5"
+    "@radix-ui/react-use-size" "0.0.6"
 
 "@radix-ui/react-slot@0.0.10":
   version "0.0.10"

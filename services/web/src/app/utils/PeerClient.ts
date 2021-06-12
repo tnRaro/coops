@@ -3,8 +3,8 @@ export const getPeerClient = async (peerId: string) => {
   const peer = new Peer(peerId, {
     host: "/",
     path: "/peer",
-    port: process.env.NODE_ENV === "development" ? 3000 : 80,
-    debug: process.env.NODE_ENV === "development" ? 3 : 0,
+    port: 443,
+    debug: process.env.NODE_ENV === "development" ? 1 : 0,
   });
   return peer;
 };

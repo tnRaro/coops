@@ -257,7 +257,7 @@ export const ParticipantItem: React.VFC<ParticipantItemProps> = (props) => {
                     max={1}
                     step={0.1}
                     value={[audioVolume]}
-                    onValueChange={(value) => {
+                    onValueChange={(value: number[]) => {
                       setAudioVolume(value[0]);
                     }}
                   >

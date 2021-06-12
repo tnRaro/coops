@@ -1,3 +1,4 @@
+import { useAtom } from "jotai";
 import { useResetAtom } from "jotai/utils";
 
 import {
@@ -10,6 +11,7 @@ import {
   muteSpeakerAtom,
   nicknameAtom,
   participantsAtom,
+  peerAtom,
   peerIdAtom,
   roomDescriptionAtom,
   roomIdAtom,
@@ -34,6 +36,7 @@ export const useResetRoom = () => {
   const resetMuteSpeaker = useResetAtom(muteSpeakerAtom);
   const resetMutedAudio = useResetAtom(mutedAudioAtom);
   const resetMutedSpeaker = useResetAtom(mutedSpeakerAtom);
+  const [peer, setPeer] = useAtom(peerAtom);
 
   const reset = () => {
     resetRoomId();
@@ -50,6 +53,8 @@ export const useResetRoom = () => {
     resetMuteSpeaker();
     resetMutedAudio();
     resetMutedSpeaker();
+    peer?.destroy();
+    setPeer(peer);
   };
 
   return reset;

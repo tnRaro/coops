@@ -36,7 +36,7 @@ export const enterParticipant = async (
     peerId,
     isHost: numOfParticipants === 1,
     isDisconnected: false,
-    muteAudio: false,
+    muteAudio: true,
     muteSpeaker: false,
     mutedAudio: false,
     mutedSpeaker: false,

@@ -15,7 +15,7 @@ services:
       - NGINX_SERVER_NAME=coops.tnraro.com
   certbot:
     image: certbot/certbot
-    command: certonly --webroot -w /var/www/certbot -d coops.tnraro.com -m admin@tnraro.com --agree-tos
+    command: /true
     volumes:
       - ./.secret/certbot/conf:/etc/letsencrypt
       - ./.secret/certbot/lib:/var/lib/letsencrypt

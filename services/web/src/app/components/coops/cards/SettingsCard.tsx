@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 import {
@@ -12,6 +13,8 @@ import {
   roomTitleAtom,
 } from "../../../atoms";
 import { useQuery } from "../../../hooks/useQuery";
+import { useResetRoom } from "../../../hooks/useResetRoom";
+import { useToast } from "../../../hooks/useToast";
 import { Button } from "../../primitives/Button";
 import { Flex } from "../../primitives/Flex";
 import { Heading4, Heading5 } from "../../primitives/Heading";
@@ -45,6 +48,9 @@ const RoomSettings: React.VFC = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const queries = useQuery();
+  const router = useRouter();
+  const resetRoom = useResetRoom();
+  const toast = useToast();
   useEffect(() => {
     setTitle(roomTitle ?? "");
   }, [roomTitle]);
@@ -92,8 +98,19 @@ const RoomSettings: React.VFC = () => {
       <Flex direction="vertical" align="center">
         <Button
           color="dangerous"
-          onClick={() => {
-            queries.resetRoom(roomId, authorId);
+          onClick={async () => {
+            try {
+              const { roomId: nextRoomId } = await queries.resetRoom(
+                roomId,
+                authorId,
+              );
+              resetRoom();
+              router.push(`/rooms/${nextRoomId}`, undefined, { shallow: true });
+              toast("새로운 방에 다시 로그인 해주세요");
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error(error);
+            }
           }}
         >
           방 초기화

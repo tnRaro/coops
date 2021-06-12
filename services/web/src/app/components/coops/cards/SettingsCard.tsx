@@ -55,7 +55,7 @@ const RoomSettings: React.VFC = () => {
   if (authorId == null) return null;
   return (
     <>
-      <Heading5>방 이름</Heading5>
+      <Heading5>방 제목</Heading5>
       <Input
         value={title}
         onChange={(event) => setTitle(event.target.value)}
@@ -70,8 +70,9 @@ const RoomSettings: React.VFC = () => {
             event.currentTarget.blur();
           }
         }}
+        placeholder="방 제목을 입력해주세요"
       />
-      <Heading5>방 설명</Heading5>
+      <Heading5>공지사항</Heading5>
       <Input
         value={description}
         onChange={(event) => setDescription(event.target.value)}
@@ -82,12 +83,12 @@ const RoomSettings: React.VFC = () => {
             });
             event.currentTarget.blur();
           } else if (event.key === "Escape") {
-            setTitle(roomDescription ?? "");
+            setDescription(roomDescription ?? "");
             event.currentTarget.blur();
           }
         }}
+        placeholder="공지사항을 입력해주세요"
       />
-      <Heading5>방 설명</Heading5>
       <Flex direction="vertical" align="center">
         <Button
           color="dangerous"

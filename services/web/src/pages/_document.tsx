@@ -1,17 +1,17 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
 
+import { getCssString } from "../app/stitches.config";
+
 class MyDocument extends Document {
   render() {
+    const styles = getCssString();
     return (
-      <Html>
+      <Html lang="ko">
         <Head>
-          <link rel="preconnect" href="https://fonts.gstatic.com" />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap"
-            rel="stylesheet"
-          />
+          <style id="stitches" dangerouslySetInnerHTML={{ __html: styles }} />
         </Head>
         <body>
+          <script>0</script>
           <Main />
           <NextScript />
         </body>

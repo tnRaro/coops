@@ -36,7 +36,7 @@ export const enterParticipant = async (
     peerId,
     isHost: numOfParticipants === 1,
     isDisconnected: false,
-    muteAudio: false,
+    muteAudio: true,
     muteSpeaker: false,
     mutedAudio: false,
     mutedSpeaker: false,
@@ -46,6 +46,11 @@ export const enterParticipant = async (
     roomId,
     participantId,
     participant,
+  );
+  await redis.participant.CRUD.setExpireToParticipant(
+    client,
+    roomId,
+    participantId,
   );
   await redis.participant.stream.createParticipant(client, roomId, participant);
   return participant;

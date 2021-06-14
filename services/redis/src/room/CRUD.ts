@@ -56,3 +56,18 @@ export const removeRoom = (client: RedisClient, roomId: string) => {
     );
   });
 };
+
+export const setExpireToRoom = (
+  client: RedisClient,
+  roomId: string,
+  expire = 86400,
+) => {
+  return new Promise<void>((resolve, reject) => {
+    client.expire(useRoomKey(roomId), expire, (error, reply) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve();
+    });
+  });
+};

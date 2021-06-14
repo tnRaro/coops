@@ -1,7 +1,11 @@
 import redis from "@coops/redis";
-import { useCallback, useEffect, useRef } from "react";
+import { useAtomValue } from "jotai/utils";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { authorIdAtom, roomIdAtom } from "../atoms";
 
 export interface ChatMessage {
+  id: string;
   message: string;
   nickname: string;
   createdAt: Date;
@@ -22,7 +26,10 @@ export type ParticipantMessage =
   | { type: "delete"; body: Nickname }
   | { type: "delete_all" };
 
-export const useStream = (roomId: string | null, authorId: string | null) => {
+export const useStream = () => {
+  const roomId = useAtomValue(roomIdAtom);
+  const authorId = useAtomValue(authorIdAtom);
+  const [tries, setTries] = useState(0);
   type ChatMessageHandler = (message: ChatMessage) => void;
   type RoomMessageHandler = (message: RoomMessage) => void;
   type ParticipantMessageHandler = (message: ParticipantMessage) => void;
@@ -59,7 +66,7 @@ export const useStream = (roomId: string | null, authorId: string | null) => {
     if (!roomId || !authorId) {
       return;
     }
-    const url = `${location.protocol}//${location.hostname}:5353/api/rooms/${roomId}/stream?key=${authorId}`;
+    const url = `/sse/rooms/${roomId}/stream?key=${authorId}`;
     const eventSource = new EventSource(url, { withCredentials: true });
     const chatHandler = (event: Event) => {
       if (chatMessageHandlerRef.current == null) {
@@ -92,6 +99,7 @@ export const useStream = (roomId: string | null, authorId: string | null) => {
       // eslint-disable-next-line no-console
       console.error(error);
       eventSource.close();
+      setTries((tries) => tries + 1);
     };
     eventSource.addEventListener("chat", chatHandler);
     eventSource.addEventListener("room", roomHandler);
@@ -103,7 +111,7 @@ export const useStream = (roomId: string | null, authorId: string | null) => {
       eventSource.removeEventListener("participant", participantHandler);
       eventSource.removeEventListener("error", errorHandler);
     };
-  }, [authorId, roomId]);
+  }, [authorId, roomId, tries]);
 
   return result.current;
 };

@@ -1,11 +1,13 @@
-import { Container, Heading } from "@chakra-ui/react";
-import { VoidFunctionComponent } from "react";
+import React, { VoidFunctionComponent } from "react";
+
+import { Container } from "../app/components/core/Container";
+import { Heading1 } from "../app/components/primitives/Heading";
 
 type PageProps = unknown;
 const Page: VoidFunctionComponent<PageProps> = (props) => {
   return (
     <Container>
-      <Heading>Work in Progress</Heading>
+      <Heading1>Work in Progress</Heading1>
     </Container>
   );
 };

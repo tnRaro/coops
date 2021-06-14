@@ -1,4 +1,5 @@
 import { RedisClient } from "redis";
+import { v4 as uuid } from "uuid";
 import * as redis from "@coops/redis";
 
 export const appendChat = async (
@@ -13,8 +14,9 @@ export const appendChat = async (
     authorId,
     "nickname",
   );
-
+  const id = uuid();
   const chat = {
+    id,
     message,
     nickname,
     createdAt: new Date(),

@@ -20,5 +20,7 @@ export const createRoom = async (client: RedisClient, title: string) => {
     roomId,
     title,
   });
+  await redis.room.CRUD.setExpireToRoom(client, roomId);
+  await redis.chat.CURD.setExpireToChat(client, roomId);
   return roomId;
 };

@@ -34,7 +34,16 @@ export default apiRouter({
       throw new HttpError(400);
     }
     const { roomId } = req.query;
-    const { message } = JSON.parse(req.body) as { message: string };
+    let message = "";
+    try {
+      const body = JSON.parse(req.body) as { message: string };
+      message = body.message;
+    } catch (error) {
+      throw new HttpError(400);
+    }
+    if (message.length > 2000) {
+      throw new HttpError(400);
+    }
     const authorId = auth(req, `Access to the room: ${roomId}`);
     return withRedisClient(async (client) => {
       if (!(await logic.participant.isParticipant(client, roomId, authorId))) {

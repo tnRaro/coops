@@ -87,21 +87,14 @@ export default apiRouter({
       let hasAuth = false;
       if (req.headers.authorization != null) {
         const authorId = auth(req, `Access to the room: ${roomId}`);
-        try {
-          const isParticipant = await logic.participant.isParticipant(
-            client,
-            roomId,
-            authorId,
-          );
-          hasAuth = isParticipant;
-        } catch (error) {
-          if (error instanceof HttpError) {
-            if (error.code !== 404) {
-              throw error;
-            }
-          } else {
-            throw error;
-          }
+        const isParticipant = await logic.participant.isParticipant(
+          client,
+          roomId,
+          authorId,
+        );
+        hasAuth = isParticipant;
+        if (!hasAuth) {
+          throw new HttpError(404);
         }
       }
       const result = {
@@ -144,6 +137,20 @@ export default apiRouter({
     return withRedisClient(async (client) => {
       await logic.participant.validateHost(client, beforeRoomId, authorId);
       const roomId = await logic.room.resetRoom(client, beforeRoomId);
+      return new HttpResult({ roomId }, 201);
+    });
+  },
+  DELETE: async (req, res) => {
+    if (!isRoomIdQuery(req.query)) {
+      throw new HttpError(400);
+    }
+    const roomId = req.query.roomId;
+    const authorId = auth(req, `Access to the room: ${roomId}`);
+    return withRedisClient(async (client) => {
+      await logic.participant.validateHost(client, roomId, authorId);
+      await logic.participant.clearParticipants(client, roomId);
+      await redis.chat.CURD.removeAllChats(client, roomId);
+      await redis.room.stream.removeRoom(client, roomId);
       return new HttpResult({ roomId }, 201);
     });
   },

@@ -1,4 +1,4 @@
-import { Chat } from "@coops/redis/dist/chat/types";
+import type * as redis from "@coops/redis";
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -19,7 +19,7 @@ import { Input } from "../../primitives/Input";
 import { Scroll } from "../../primitives/Scroll";
 import { Text } from "../../primitives/Text";
 
-interface ChatItemProps extends Chat {
+interface ChatItemProps extends redis.chat.types.Chat {
   isHost: boolean;
   isMe: boolean;
 }

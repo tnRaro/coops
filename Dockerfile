@@ -28,10 +28,6 @@ COPY --from=build /app/services/logic/package.json ./services/logic/package.json
 COPY --from=build /app/services/logic/dist/ ./services/logic/dist
 RUN yarn install --frozen-lockfile --ignore-optional
 COPY --from=build /app/services/web/.next/ ./services/web/.next/
-COPY services/web/src/ ./services/web/src
-COPY services/web/public/ ./services/web/public
-# for DEV MODE
-COPY services/web/next.config.js services/web/tsconfig.json services/web/.env.local ./services/web/
 
 FROM node:15.14.0-alpine3.13 AS sse
 WORKDIR /app

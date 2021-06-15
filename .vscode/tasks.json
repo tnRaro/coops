@@ -9,7 +9,7 @@
       "dockerCompose": {
         "up": {
           "detached": true,
-          "build": true
+          "build": false
         }
       }
     },
@@ -19,7 +19,7 @@
       "dockerCompose": {
         "down": {
           "detached": true,
-          "build": true
+          "build": false
         }
       }
     },

@@ -13,34 +13,14 @@ services:
       - 443:443
     environment:
       - NGINX_SERVER_NAME=coops.tnraro.com
-  certbot:
-    image: certbot/certbot
-    command: /true
-    volumes:
-      - ./.secret/certbot/conf:/etc/letsencrypt
-      - ./.secret/certbot/lib:/var/lib/letsencrypt
-      - ./.secret/certbot/www:/var/www/certbot
   web:
     command: yarn web start
-    build:
-      context: ./
-      dockerfile: Dockerfile
-      target: "web"
-      args:
-        ENV: production
-        NODE_ENV: production
+    image: ghcr.io/hoshi-hitsuji/coops_web:latest
     working_dir: /app
     env_file: "./services/web/.env.local"
   sse:
     command: node ./services/sse/dist/index.js
-    build:
-      context: ./
-      dockerfile: Dockerfile
-      target: "sse"
-      args:
-        ENV: production
-        NODE_ENV: production
-    working_dir: /app
+    image: ghcr.io/hoshi-hitsuji/coops_sse:latest
   peer:
     image: peerjs/peerjs-server
     command: --port 9000 --path /peer
